@@ -26,7 +26,7 @@
         <div class="permiso-pila @if ($pilaInvalida) is-invalid @endif" data-permiso-pila>
             <p class="form-label mb-1">Permisos</p>
             <p class="form-text mt-0 mb-2">
-                Elige uno o varios y pásalos con los botones. Ctrl o Cmd suma a la selección; Mayús selecciona un rango.
+                Haz clic en uno o varios permisos y pásalos con los botones. Mayús selecciona un rango.
             </p>
 
             <div class="permiso-pila__layout">

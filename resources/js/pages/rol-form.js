@@ -111,12 +111,9 @@ if (root) {
             all.forEach((el, index) => {
                 el.setAttribute('aria-selected', index >= from && index <= to ? 'true' : 'false');
             });
-        } else if (event.metaKey || event.ctrlKey) {
+        } else {
             const selected = item.getAttribute('aria-selected') === 'true';
             item.setAttribute('aria-selected', selected ? 'false' : 'true');
-            anchors.set(list, item);
-        } else {
-            all.forEach((el) => el.setAttribute('aria-selected', el === item ? 'true' : 'false'));
             anchors.set(list, item);
         }
 

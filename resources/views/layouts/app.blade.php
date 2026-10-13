@@ -21,7 +21,7 @@
             @include('layouts.partials.topbar')
 
             <main class="app-content">
-                <div class="container-fluid">
+                <div class="container-lg">
                     @include('partials.alerts')
 
                     @yield('content')

@@ -443,8 +443,7 @@ table.dataTable td.acciones {
 }
 
 .permiso-pila__list {
-    min-height: 16rem;
-    max-height: 22rem;
+    height: 22rem;
     overflow: auto;
     user-select: none;
 }
