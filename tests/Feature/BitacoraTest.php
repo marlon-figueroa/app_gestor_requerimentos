@@ -63,6 +63,25 @@ class BitacoraTest extends TestCase
         $this->actingAs($admin)->get(route('admin.bitacora.pdf'))->assertOk()->assertHeader('content-type', 'application/pdf');
     }
 
+    public function test_detalle_de_registro_es_una_vista_html(): void
+    {
+        $admin = User::factory()->create()->assignRole('Administrador');
+        $registro = Bitacora::create([
+            'usuario_id' => $admin->id,
+            'tipo_accion' => 'personalizada',
+            'accion' => 'Prueba de detalle',
+            'descripcion' => 'Descripción visible en la vista',
+            'exitoso' => true,
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.bitacora.show', $registro))
+            ->assertOk()
+            ->assertSee('Detalle del registro', false)
+            ->assertSee('Prueba de detalle', false)
+            ->assertSee('Descripción visible en la vista', false);
+    }
+
     public function test_monitoreo_requiere_permiso(): void
     {
         $admin = User::factory()->create()->assignRole('Administrador');

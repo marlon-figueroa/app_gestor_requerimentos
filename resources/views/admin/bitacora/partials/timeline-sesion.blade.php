@@ -11,7 +11,8 @@
         'logout' => 'box-arrow-right',
         'login_fallido' => 'shield-x',
         'bloqueo' => 'lock',
-        default => 'gear',
+        'personalizada' => 'gear',
+        default => 'dot',
     };
 @endphp
 
