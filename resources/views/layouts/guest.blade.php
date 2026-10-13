@@ -33,11 +33,11 @@
     </nav>
 
     <main class="guest-content">
-        <div class="container">
+        <div class="container-fluid">
             @include('partials.alerts')
-        </div>
 
-        @yield('content')
+            @yield('content')
+        </div>
     </main>
 
     @include('layouts.partials.footer')

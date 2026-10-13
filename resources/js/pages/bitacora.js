@@ -1,5 +1,6 @@
 import $ from '../libs/jquery';
 import DataTable, { serverTable, reloadTables } from '../libs/datatables';
+import { alertMessage, confirmAction, notify } from '../libs/helpers';
 
 const tableEl = document.getElementById('tabla-bitacora');
 
@@ -57,6 +58,45 @@ if (sesionesEl) {
             { data: 'cliente', orderable: false, searchable: false },
             { data: 'acciones', orderable: false, searchable: false, className: 'acciones text-end' },
         ],
+    });
+
+    sesionesEl.addEventListener('click', async (event) => {
+        const button = event.target.closest('[data-invalidate-session-url]');
+
+        if (!button) {
+            return;
+        }
+
+        event.preventDefault();
+
+        const usuario = button.dataset.usuario || 'este usuario';
+        const confirmado = await confirmAction({
+            title: '¿Invalidar sesión?',
+            text: `Se desconectará a ${usuario} de forma inmediata. La cuenta no será bloqueada.`,
+            confirmText: 'Sí, invalidar sesión',
+            danger: true,
+        });
+
+        if (!confirmado) {
+            return;
+        }
+
+        button.disabled = true;
+
+        window.axios
+            .post(button.dataset.invalidateSessionUrl)
+            .then(({ data }) => {
+                notify(data.message || 'Sesión invalidada correctamente.');
+                reloadTables();
+            })
+            .catch((error) => {
+                alertMessage({
+                    title: 'No se pudo invalidar la sesión',
+                    text: error.response?.data?.message || 'Ocurrió un error al invalidar la sesión.',
+                    type: 'error',
+                });
+                button.disabled = false;
+            });
     });
 }
 

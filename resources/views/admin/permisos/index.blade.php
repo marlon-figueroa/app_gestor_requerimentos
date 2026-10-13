@@ -3,8 +3,7 @@
 @section('title', 'Permisos')
 
 @section('content')
-<div class="container-fluid">
-    <x-page-header title="Permisos" icon="key">
+    <x-page-header title="Permisos" icon="key" subtitle="Capacidades individuales del sistema.">
         @can('permisos.crear')
             <a href="{{ route('admin.permisos.create') }}" class="btn btn-primary">
                 <i class="bi bi-plus-lg"></i> Nuevo permiso
@@ -26,7 +25,6 @@
             </table>
         </div>
     </div>
-</div>
 @endsection
 
 @push('scripts')

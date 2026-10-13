@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Bitacora;
 use App\Models\User;
 use App\Models\UserSession;
+use App\Services\BitacoraService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
@@ -29,6 +30,7 @@ class BitacoraController extends Controller
         $this->middleware('permission:bitacora.ver|monitoreo.pulse|monitoreo.logs')->only('index');
         $this->middleware('permission:bitacora.ver')->only(['data', 'show', 'sessionsData', 'showSesion']);
         $this->middleware('permission:bitacora.exportar')->only('pdf');
+        $this->middleware('permission:bitacora.invalidar_sesion')->only('invalidateSession');
     }
 
     public function index()
@@ -67,6 +69,45 @@ class BitacoraController extends Controller
             ])->render())
             ->rawColumns(['acciones'])
             ->toJson();
+    }
+
+    public function invalidateSession(Request $request, string $sesion, BitacoraService $bitacora): JsonResponse
+    {
+        if ($request->session()->getId() === $sesion) {
+            return response()->json([
+                'message' => 'No puede invalidar la sesión que está utilizando en este navegador.',
+            ], 422);
+        }
+
+        $sesionActiva = UserSession::query()->activas()->with('user:id,name,email')->find($sesion);
+
+        if (! $sesionActiva) {
+            return response()->json([
+                'message' => 'La sesión no existe o ya expiró.',
+            ], 404);
+        }
+
+        $usuario = $sesionActiva->user;
+        $nombre = $usuario?->name ?? 'Usuario';
+        $admin = $request->user();
+
+        $bitacora->registrar('sesion_invalidada', 'Desconexión forzada por administrador', [
+            'usuario_id' => $sesionActiva->user_id,
+            'descripcion' => "El administrador {$admin->name} invalidó la sesión activa de {$nombre}",
+            'modulo' => 'sesiones',
+            'sesion_id' => $sesion,
+            'datos_adicionales' => [
+                'administrador_id' => $admin->id,
+                'administrador' => $admin->name,
+                'sesion_invalidada' => $sesion,
+            ],
+        ]);
+
+        $sesionActiva->delete();
+
+        return response()->json([
+            'message' => "Sesión de {$nombre} invalidada. El usuario será enviado al login de inmediato.",
+        ]);
     }
 
     public function showSesion(string $sesion): View

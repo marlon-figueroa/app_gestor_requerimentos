@@ -3,8 +3,7 @@
 @section('title', 'Usuarios')
 
 @section('content')
-<div class="container-fluid">
-    <x-page-header title="Usuarios" icon="people">
+    <x-page-header title="Usuarios" icon="people" subtitle="Administración de cuentas y accesos.">
         @can('usuarios.exportar')
             <a href="{{ route('admin.usuarios.pdf') }}" id="btn-exportar-pdf" class="btn btn-outline-danger">
                 <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
@@ -72,7 +71,6 @@
             </table>
         </div>
     </div>
-</div>
 @endsection
 
 @push('scripts')

@@ -67,6 +67,52 @@ class BitacoraSesionesTest extends TestCase
             ->assertSee('Consulta de usuarios', false);
     }
 
+    public function test_invalidar_sesion_requiere_permiso(): void
+    {
+        $admin = User::factory()->create()->assignRole('Administrador');
+        $user = User::factory()->create()->assignRole('Usuario');
+        $sessionId = Str::random(40);
+
+        DB::table('sessions')->insert([
+            'id' => $sessionId,
+            'user_id' => $user->id,
+            'ip_address' => '127.0.0.1',
+            'user_agent' => 'Test',
+            'payload' => base64_encode(serialize([])),
+            'last_activity' => now()->timestamp,
+        ]);
+
+        $this->actingAs($user)->postJson(route('admin.bitacora.sesiones.invalidar', $sessionId))->assertForbidden();
+    }
+
+    public function test_administrador_invalida_sesion_y_registra_bitacora(): void
+    {
+        $admin = User::factory()->create()->assignRole('Administrador');
+        $user = User::factory()->create(['name' => 'Conectado'])->assignRole('Usuario');
+        $sessionId = Str::random(40);
+
+        DB::table('sessions')->insert([
+            'id' => $sessionId,
+            'user_id' => $user->id,
+            'ip_address' => '127.0.0.1',
+            'user_agent' => 'Test',
+            'payload' => base64_encode(serialize([])),
+            'last_activity' => now()->timestamp,
+        ]);
+
+        $this->actingAs($admin)
+            ->postJson(route('admin.bitacora.sesiones.invalidar', $sessionId))
+            ->assertOk()
+            ->assertJsonPath('message', 'Sesión de Conectado invalidada. El usuario será enviado al login de inmediato.');
+
+        $this->assertDatabaseMissing('sessions', ['id' => $sessionId]);
+        $this->assertDatabaseHas('bitacoras', [
+            'tipo_accion' => 'sesion_invalidada',
+            'usuario_id' => $user->id,
+            'sesion_id' => $sessionId,
+        ]);
+    }
+
     public function test_vista_de_sesion_expirada_responde_404(): void
     {
         $admin = User::factory()->create()->assignRole('Administrador');

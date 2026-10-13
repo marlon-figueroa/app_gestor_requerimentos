@@ -3,7 +3,6 @@
 @section('title', 'Nuevo usuario')
 
 @section('content')
-<div class="container-fluid">
     <x-page-header title="Nuevo usuario" icon="person-plus"
                    :parent="['url' => route('admin.usuarios.index'), 'label' => 'Usuarios']" />
 
@@ -14,5 +13,4 @@
             </form>
         </div>
     </div>
-</div>
 @endsection

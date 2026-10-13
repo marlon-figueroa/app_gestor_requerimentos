@@ -7,6 +7,7 @@
         'logout' => 'text-bg-secondary',
         'login_fallido' => 'text-bg-warning',
         'bloqueo' => 'bg-danger-subtle text-danger-emphasis border border-danger-subtle',
+        'sesion_invalidada' => 'text-bg-dark',
         default => 'bg-body-secondary text-body-emphasis border',
     };
 @endphp

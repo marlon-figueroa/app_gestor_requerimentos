@@ -12,6 +12,7 @@
         'login_fallido' => 'shield-x',
         'bloqueo' => 'lock',
         'personalizada' => 'gear',
+        'sesion_invalidada' => 'box-arrow-right',
         default => 'dot',
     };
 @endphp

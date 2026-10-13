@@ -354,6 +354,33 @@ table.dataTable td.acciones {
     }
 }
 
+.view-header {
+    &__icon {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 3rem;
+        height: 3rem;
+        border-radius: 0.5rem;
+        background-color: var(--bs-primary-bg-subtle);
+        color: var(--bs-primary);
+        font-size: 1.35rem;
+    }
+
+    &__media {
+        flex-shrink: 0;
+        width: 3rem;
+        height: 3rem;
+        object-fit: cover;
+        border-radius: 0.5rem;
+    }
+
+    &__breadcrumb .breadcrumb {
+        --bs-breadcrumb-margin-bottom: 0;
+    }
+}
+
 .photo-dropzone-input {
     position: absolute;
     width: 1px;

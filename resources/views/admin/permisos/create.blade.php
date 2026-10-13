@@ -3,7 +3,6 @@
 @section('title', 'Nuevo permiso')
 
 @section('content')
-<div class="container-fluid">
     <x-page-header title="Nuevo permiso" icon="plus-circle"
                    :parent="['url' => route('admin.permisos.index'), 'label' => 'Permisos']" />
 
@@ -14,5 +13,4 @@
             </form>
         </div>
     </div>
-</div>
 @endsection

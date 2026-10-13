@@ -3,7 +3,6 @@
 @section('title', 'Editar rol')
 
 @section('content')
-<div class="container-fluid">
     <x-page-header title="Editar rol" icon="pencil-square"
                    :parent="['url' => route('admin.roles.index'), 'label' => 'Roles']" />
 
@@ -15,5 +14,4 @@
             </form>
         </div>
     </div>
-</div>
 @endsection

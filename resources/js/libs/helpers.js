@@ -1,7 +1,7 @@
 import { reloadTables } from './datatables';
 import { notify, confirmAction, alertMessage } from './alerts';
 
-export { notify };
+export { notify, confirmAction, alertMessage };
 
 /**
  * Elimina un recurso via Axios (DELETE) tras confirmar y recarga las DataTables.

@@ -3,11 +3,12 @@
 @section('title', 'Inicio')
 
 @section('content')
-<div class="container-fluid">
-    <div class="d-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0"><i class="bi bi-speedometer2 me-2"></i>{{ __('Dashboard') }}</h1>
-        <span class="text-muted small">{{ now()->translatedFormat('l, d \d\e F \d\e Y') }}</span>
-    </div>
+    <x-page-header
+        :title="__('Dashboard')"
+        icon="speedometer2"
+        :subtitle="now()->translatedFormat('l, d \d\e F \d\e Y')"
+        :section="null"
+    />
 
     <p class="lead">Bienvenido(a), <strong>{{ Auth::user()->name }}</strong>.</p>
 
@@ -33,5 +34,4 @@
             </div>
         @endforeach
     </div>
-</div>
 @endsection

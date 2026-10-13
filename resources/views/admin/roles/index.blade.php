@@ -3,8 +3,7 @@
 @section('title', 'Roles')
 
 @section('content')
-<div class="container-fluid">
-    <x-page-header title="Roles" icon="person-badge">
+    <x-page-header title="Roles" icon="person-badge" subtitle="Perfiles de permisos asignables a usuarios.">
         @can('roles.crear')
             <a href="{{ route('admin.roles.create') }}" class="btn btn-primary">
                 <i class="bi bi-plus-lg"></i> Nuevo rol
@@ -27,7 +26,6 @@
             </table>
         </div>
     </div>
-</div>
 @endsection
 
 @push('scripts')

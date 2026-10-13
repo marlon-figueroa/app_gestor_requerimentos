@@ -16,7 +16,7 @@ class RolesAndPermissionsSeeder extends Seeder
         'usuarios' => ['ver', 'crear', 'editar', 'eliminar', 'exportar'],
         'roles' => ['ver', 'crear', 'editar', 'eliminar'],
         'permisos' => ['ver', 'crear', 'editar', 'eliminar'],
-        'bitacora' => ['ver', 'exportar'],
+        'bitacora' => ['ver', 'exportar', 'invalidar_sesion'],
         'monitoreo' => ['pulse', 'logs'],
     ];
 

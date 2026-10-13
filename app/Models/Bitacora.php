@@ -17,6 +17,7 @@ class Bitacora extends Model
         'logout' => 'Salida',
         'login_fallido' => 'Login fallido',
         'bloqueo' => 'Bloqueo',
+        'sesion_invalidada' => 'Sesión invalidada',
     ];
 
     protected $table = 'bitacoras';

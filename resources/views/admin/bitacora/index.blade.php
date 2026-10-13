@@ -12,8 +12,11 @@
     ], fn ($pestana) => $pestana['visible']);
     $activa = array_key_first($pestanas);
 @endphp
-<div class="container-fluid">
-    <x-page-header title="Bitácora" icon="journal-text">
+    <x-page-header
+        title="Bitácora"
+        icon="journal-text"
+        subtitle="Registros de actividad, sesiones activas y herramientas de monitoreo."
+    >
         @can('bitacora.exportar')
             <a href="{{ route('admin.bitacora.pdf') }}" id="btn-exportar-pdf" class="btn btn-outline-danger @if ($activa !== 'registros') d-none @endif">
                 <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
@@ -57,7 +60,6 @@
             ])
         @endcan
     </div>
-</div>
 
 @stack('modals')
 @endsection
