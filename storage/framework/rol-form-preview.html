@@ -1,0 +1,113 @@
+<input type="hidden" name="_token" value="" autocomplete="off">
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <label for="name" class="form-label">Nombre <span class="text-danger">*</span></label>
+        <input type="text" id="name" name="name" value="Prueba"
+               class="form-control " required  autofocus>
+                    </div>
+
+    <div class="col-12">
+                                        
+        <div class="permiso-pila " data-permiso-pila>
+            <p class="form-label mb-1">Permisos</p>
+            <p class="form-text mt-0 mb-2">
+                Elige uno o varios y pásalos con los botones. Ctrl o Cmd suma a la selección; Mayús selecciona un rango.
+            </p>
+
+            <div class="permiso-pila__layout">
+                <section class="permiso-pila__panel" aria-labelledby="permisos-disponibles-titulo">
+                    <div class="permiso-pila__head">
+                        <span class="permiso-pila__title" id="permisos-disponibles-titulo">Disponibles</span>
+                        <span class="badge text-bg-secondary" data-count="available">3</span>
+                    </div>
+                    <div class="permiso-pila__body">
+                        <div class="permiso-pila__list" role="listbox" aria-multiselectable="true" aria-labelledby="permisos-disponibles-titulo" tabindex="0" data-side="available">
+                                                                                                                                <div class="permiso-pila__group" data-group="Usuarios" data-group-order="0">
+                                        <div class="permiso-pila__group-label">Usuarios</div>
+                                                                                                                                                                            <button type="button" role="option" class="permiso-pila__item" data-value="usuarios.crear" data-group="Usuarios" data-group-order="0" data-item-order="1" aria-selected="false" aria-label="usuarios.crear" title="usuarios.crear" tabindex="-1">
+                                                <span class="permiso-pila__accion">crear</span>
+                                                <span class="permiso-pila__codigo">usuarios.crear</span>
+                                            </button>
+                                                                                                                                <button type="button" role="option" class="permiso-pila__item" data-value="usuarios.editar" data-group="Usuarios" data-group-order="0" data-item-order="2" aria-selected="false" aria-label="usuarios.editar" title="usuarios.editar" tabindex="-1">
+                                                <span class="permiso-pila__accion">editar</span>
+                                                <span class="permiso-pila__codigo">usuarios.editar</span>
+                                            </button>
+                                                                            </div>
+                                                                                                                                                                <div class="permiso-pila__group" data-group="Roles" data-group-order="1">
+                                        <div class="permiso-pila__group-label">Roles</div>
+                                                                                                                                <button type="button" role="option" class="permiso-pila__item" data-value="roles.ver" data-group="Roles" data-group-order="1" data-item-order="0" aria-selected="false" aria-label="roles.ver" title="roles.ver" tabindex="-1">
+                                                <span class="permiso-pila__accion">ver</span>
+                                                <span class="permiso-pila__codigo">roles.ver</span>
+                                            </button>
+                                                                            </div>
+                                                                                    </div>
+                        <p class="permiso-pila__empty"  hidden >
+                            No quedan permisos disponibles.
+                        </p>
+                    </div>
+                </section>
+
+                <div class="permiso-pila__actions" role="group" aria-label="Traspaso de permisos">
+                    <button type="button" class="btn btn-outline-primary btn-sm" data-action="grant" disabled>
+                        <i class="bi bi-chevron-right d-none d-md-inline" aria-hidden="true"></i>
+                        <i class="bi bi-chevron-down d-inline d-md-none" aria-hidden="true"></i>
+                        Asignar
+                    </button>
+                    <button type="button" class="btn btn-outline-primary btn-sm" data-action="grant-all" >
+                        <i class="bi bi-chevron-double-right d-none d-md-inline" aria-hidden="true"></i>
+                        <i class="bi bi-chevron-double-down d-inline d-md-none" aria-hidden="true"></i>
+                        Asignar todos
+                    </button>
+                    <hr class="permiso-pila__divider">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-action="revoke" disabled>
+                        <i class="bi bi-chevron-left d-none d-md-inline" aria-hidden="true"></i>
+                        <i class="bi bi-chevron-up d-inline d-md-none" aria-hidden="true"></i>
+                        Quitar
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-action="revoke-all" >
+                        <i class="bi bi-chevron-double-left d-none d-md-inline" aria-hidden="true"></i>
+                        <i class="bi bi-chevron-double-up d-inline d-md-none" aria-hidden="true"></i>
+                        Quitar todos
+                    </button>
+                </div>
+
+                <section class="permiso-pila__panel" aria-labelledby="permisos-otorgados-titulo">
+                    <div class="permiso-pila__head">
+                        <span class="permiso-pila__title" id="permisos-otorgados-titulo">Otorgados</span>
+                        <span class="badge text-bg-secondary" data-count="granted">1</span>
+                    </div>
+                    <div class="permiso-pila__body">
+                        <div class="permiso-pila__list" role="listbox" aria-multiselectable="true" aria-labelledby="permisos-otorgados-titulo" tabindex="0" data-side="granted">
+                                                                                                                                <div class="permiso-pila__group" data-group="Usuarios" data-group-order="0">
+                                        <div class="permiso-pila__group-label">Usuarios</div>
+                                                                                                                                <button type="button" role="option" class="permiso-pila__item" data-value="usuarios.ver" data-group="Usuarios" data-group-order="0" data-item-order="0" aria-selected="false" aria-label="usuarios.ver" title="usuarios.ver" tabindex="-1">
+                                                <span class="permiso-pila__accion">ver</span>
+                                                <span class="permiso-pila__codigo">usuarios.ver</span>
+                                            </button>
+                                                                                                                                                                    </div>
+                                                                                                                                                                                </div>
+                        <p class="permiso-pila__empty"  hidden >
+                            Aún no hay permisos otorgados.
+                        </p>
+                    </div>
+                </section>
+            </div>
+
+            <select id="permissions" name="permissions[]" multiple class="permiso-pila__input" tabindex="-1" aria-hidden="true">
+                                                                                    <option value="usuarios.ver" selected>usuarios.ver</option>
+                                                                                                                                                            </select>
+        </div>
+
+                    </div>
+</div>
+
+<div class="d-flex justify-content-end gap-2 mt-4">
+    <a href="http://127.0.0.1:8000/admin/roles" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Cancelar
+    </a>
+    <button type="submit" class="btn btn-primary">
+        <i class="bi bi-save"></i> Guardar
+    </button>
+</div>
+

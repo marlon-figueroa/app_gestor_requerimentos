@@ -14,18 +14,115 @@
     </div>
 
     <div class="col-12">
-        <label for="permissions" class="form-label">Permisos</label>
-        @php($selected = old('permissions', $role->exists ? $role->permissions->pluck('name')->all() : []))
-        <select id="permissions" name="permissions[]" multiple data-placeholder="Seleccione los permisos"
-                class="form-select select2 @error('permissions') is-invalid @enderror @error('permissions.*') is-invalid @enderror">
-            @foreach ($permissions as $modulo => $items)
-                <optgroup label="{{ $modulo }}">
+        @php($selected = array_values(array_filter(
+            (array) old('permissions', $role->exists ? $role->permissions->pluck('name')->all() : []),
+            fn ($permiso) => is_string($permiso) && $permiso !== ''
+        )))
+        @php($catalogo = $permissions->flatten())
+        @php($otorgadosCount = $catalogo->filter(fn ($permiso) => in_array($permiso, $selected, true))->count())
+        @php($disponiblesCount = $catalogo->count() - $otorgadosCount)
+        @php($pilaInvalida = $errors->has('permissions') || $errors->has('permissions.*'))
+
+        <div class="permiso-pila @if ($pilaInvalida) is-invalid @endif" data-permiso-pila>
+            <p class="form-label mb-1">Permisos</p>
+            <p class="form-text mt-0 mb-2">
+                Elige uno o varios y pásalos con los botones. Ctrl o Cmd suma a la selección; Mayús selecciona un rango.
+            </p>
+
+            <div class="permiso-pila__layout">
+                <section class="permiso-pila__panel" aria-labelledby="permisos-disponibles-titulo">
+                    <div class="permiso-pila__head">
+                        <span class="permiso-pila__title" id="permisos-disponibles-titulo">Disponibles</span>
+                        <span class="badge text-bg-secondary" data-count="available">{{ $disponiblesCount }}</span>
+                    </div>
+                    <div class="permiso-pila__body">
+                        <div class="permiso-pila__list" role="listbox" aria-multiselectable="true" aria-labelledby="permisos-disponibles-titulo" tabindex="0" data-side="available">
+                            @foreach ($permissions as $modulo => $items)
+                                @php($disponibles = $items->reject(fn ($permiso) => in_array($permiso, $selected, true)))
+                                @if ($disponibles->isNotEmpty())
+                                    <div class="permiso-pila__group" data-group="{{ $modulo }}" data-group-order="{{ $loop->index }}">
+                                        <div class="permiso-pila__group-label">{{ $modulo }}</div>
+                                        @foreach ($items as $permiso)
+                                            @continue(in_array($permiso, $selected, true))
+                                            <button type="button" role="option" class="permiso-pila__item" data-value="{{ $permiso }}" data-group="{{ $modulo }}" data-group-order="{{ $loop->parent->index }}" data-item-order="{{ $loop->index }}" aria-selected="false" aria-label="{{ $permiso }}" title="{{ $permiso }}" tabindex="-1">
+                                                <span class="permiso-pila__accion">{{ str_replace('_', ' ', \Illuminate\Support\Str::after($permiso, '.')) }}</span>
+                                                <span class="permiso-pila__codigo">{{ $permiso }}</span>
+                                            </button>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            @endforeach
+                        </div>
+                        <p class="permiso-pila__empty" @if ($disponiblesCount > 0) hidden @endif>
+                            No quedan permisos disponibles.
+                        </p>
+                    </div>
+                </section>
+
+                <div class="permiso-pila__actions" role="group" aria-label="Traspaso de permisos">
+                    <button type="button" class="btn btn-outline-primary btn-sm" data-action="grant" disabled>
+                        <i class="bi bi-chevron-right d-none d-md-inline" aria-hidden="true"></i>
+                        <i class="bi bi-chevron-down d-inline d-md-none" aria-hidden="true"></i>
+                        Asignar
+                    </button>
+                    <button type="button" class="btn btn-outline-primary btn-sm" data-action="grant-all" @disabled($disponiblesCount === 0)>
+                        <i class="bi bi-chevron-double-right d-none d-md-inline" aria-hidden="true"></i>
+                        <i class="bi bi-chevron-double-down d-inline d-md-none" aria-hidden="true"></i>
+                        Asignar todos
+                    </button>
+                    <hr class="permiso-pila__divider">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-action="revoke" disabled>
+                        <i class="bi bi-chevron-left d-none d-md-inline" aria-hidden="true"></i>
+                        <i class="bi bi-chevron-up d-inline d-md-none" aria-hidden="true"></i>
+                        Quitar
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-action="revoke-all" @disabled($otorgadosCount === 0)>
+                        <i class="bi bi-chevron-double-left d-none d-md-inline" aria-hidden="true"></i>
+                        <i class="bi bi-chevron-double-up d-inline d-md-none" aria-hidden="true"></i>
+                        Quitar todos
+                    </button>
+                </div>
+
+                <section class="permiso-pila__panel" aria-labelledby="permisos-otorgados-titulo">
+                    <div class="permiso-pila__head">
+                        <span class="permiso-pila__title" id="permisos-otorgados-titulo">Otorgados</span>
+                        <span class="badge text-bg-secondary" data-count="granted">{{ $otorgadosCount }}</span>
+                    </div>
+                    <div class="permiso-pila__body">
+                        <div class="permiso-pila__list" role="listbox" aria-multiselectable="true" aria-labelledby="permisos-otorgados-titulo" tabindex="0" data-side="granted">
+                            @foreach ($permissions as $modulo => $items)
+                                @php($otorgados = $items->filter(fn ($permiso) => in_array($permiso, $selected, true)))
+                                @if ($otorgados->isNotEmpty())
+                                    <div class="permiso-pila__group" data-group="{{ $modulo }}" data-group-order="{{ $loop->index }}">
+                                        <div class="permiso-pila__group-label">{{ $modulo }}</div>
+                                        @foreach ($items as $permiso)
+                                            @continue(! in_array($permiso, $selected, true))
+                                            <button type="button" role="option" class="permiso-pila__item" data-value="{{ $permiso }}" data-group="{{ $modulo }}" data-group-order="{{ $loop->parent->index }}" data-item-order="{{ $loop->index }}" aria-selected="false" aria-label="{{ $permiso }}" title="{{ $permiso }}" tabindex="-1">
+                                                <span class="permiso-pila__accion">{{ str_replace('_', ' ', \Illuminate\Support\Str::after($permiso, '.')) }}</span>
+                                                <span class="permiso-pila__codigo">{{ $permiso }}</span>
+                                            </button>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            @endforeach
+                        </div>
+                        <p class="permiso-pila__empty" @if ($otorgadosCount > 0) hidden @endif>
+                            Aún no hay permisos otorgados.
+                        </p>
+                    </div>
+                </section>
+            </div>
+
+            <select id="permissions" name="permissions[]" multiple class="permiso-pila__input" tabindex="-1" aria-hidden="true">
+                @foreach ($permissions as $items)
                     @foreach ($items as $permiso)
-                        <option value="{{ $permiso }}" @selected(in_array($permiso, $selected))>{{ $permiso }}</option>
+                        @continue(! in_array($permiso, $selected, true))
+                        <option value="{{ $permiso }}" selected>{{ $permiso }}</option>
                     @endforeach
-                </optgroup>
-            @endforeach
-        </select>
+                @endforeach
+            </select>
+        </div>
+
         @error('permissions')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
         @error('permissions.*')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
     </div>
@@ -39,3 +136,7 @@
         <i class="bi bi-save"></i> Guardar
     </button>
 </div>
+
+@push('scripts')
+    @vite('resources/js/pages/rol-form.js')
+@endpush

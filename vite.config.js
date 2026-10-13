@@ -10,6 +10,7 @@ export default defineConfig({
                 'resources/js/pages/usuarios.js',
                 'resources/js/pages/usuario-form.js',
                 'resources/js/pages/roles.js',
+                'resources/js/pages/rol-form.js',
                 'resources/js/pages/permisos.js',
                 'resources/js/pages/bitacora.js',
             ],

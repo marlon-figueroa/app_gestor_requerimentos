@@ -12,6 +12,22 @@ class RoleRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        $permisos = $this->input('permissions', []);
+
+        if (! is_array($permisos)) {
+            $permisos = [];
+        }
+
+        $this->merge([
+            'permissions' => array_values(array_filter(
+                $permisos,
+                fn ($permiso) => is_string($permiso) && $permiso !== ''
+            )),
+        ]);
+    }
+
     public function rules(): array
     {
         return [

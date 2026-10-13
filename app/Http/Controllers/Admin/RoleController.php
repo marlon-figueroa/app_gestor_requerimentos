@@ -95,7 +95,7 @@ class RoleController extends Controller
     }
 
     /**
-     * Permisos agrupados por modulo (prefijo antes del punto) para los optgroup de Select2.
+     * Permisos agrupados por modulo (prefijo antes del punto) para las pilas del formulario.
      */
     private function groupedPermissions(): Collection
     {
