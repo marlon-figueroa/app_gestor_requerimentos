@@ -9,7 +9,7 @@
 
     <div class="card">
         <div class="card-body">
-            <form method="POST" action="{{ route('admin.usuarios.store') }}" autocomplete="off">
+            <form method="POST" action="{{ route('admin.usuarios.store') }}" enctype="multipart/form-data" autocomplete="off">
                 @include('admin.usuarios._form')
             </form>
         </div>

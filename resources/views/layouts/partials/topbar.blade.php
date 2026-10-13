@@ -14,7 +14,7 @@
 
             <li class="nav-item dropdown">
                 <a id="user-menu" class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <img src="{{ asset('image/user_image.png') }}" alt="" class="rounded-circle me-2" width="28" height="28">
+                    <img src="{{ Auth::user()->photoUrl() }}" alt="" class="rounded-circle object-fit-cover me-2" width="28" height="28">
                     <span class="d-none d-sm-inline">{{ Auth::user()->name }}</span>
                 </a>
 

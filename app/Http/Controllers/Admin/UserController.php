@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
+use Throwable;
 use Yajra\DataTables\Facades\DataTables;
 
 class UserController extends Controller
@@ -41,6 +42,7 @@ class UserController extends Controller
                 'items' => $user->roles->pluck('name'),
                 'color' => 'info',
             ])->render())
+            ->editColumn('name', fn (User $user) => view('admin.usuarios.partials.nombre', ['user' => $user])->render())
             ->editColumn('created_at', fn (User $user) => $user->created_at?->format('d/m/Y H:i'))
             ->addColumn('acciones', fn (User $user) => view('admin.partials.acciones', [
                 'editUrl' => route('admin.usuarios.edit', $user),
@@ -49,7 +51,7 @@ class UserController extends Controller
                 'deletePermission' => 'usuarios.eliminar',
                 'confirm' => "¿Eliminar al usuario {$user->name}?",
             ])->render())
-            ->rawColumns(['roles', 'acciones'])
+            ->rawColumns(['name', 'roles', 'acciones'])
             ->toJson();
     }
 
@@ -63,7 +65,20 @@ class UserController extends Controller
 
     public function store(UserRequest $request, BitacoraService $bitacora)
     {
-        $user = User::create($request->safe()->only(['name', 'email', 'password']));
+        $ruta = $this->guardarFoto($request);
+        $data = $request->safe()->only(['name', 'email', 'password']);
+
+        if ($ruta) {
+            $data['path_photo'] = $ruta;
+        }
+
+        try {
+            $user = User::create($data);
+        } catch (Throwable $e) {
+            User::borrarFoto($ruta);
+            throw $e;
+        }
+
         $user->syncRoles($request->input('roles', []));
         $bitacora->registrarCambioRelacion($user, 'usuarios', 'roles', [], $user->getRoleNames()->all());
 
@@ -81,14 +96,29 @@ class UserController extends Controller
     public function update(UserRequest $request, User $user, BitacoraService $bitacora)
     {
         $data = $request->safe()->only(['name', 'email']);
+        $fotoAnterior = $user->path_photo;
+        $fotoNueva = $this->guardarFoto($request);
 
         if ($request->filled('password')) {
             $data['password'] = $request->input('password');
         }
 
+        if ($fotoNueva) {
+            $data['path_photo'] = $fotoNueva;
+        }
+
         $rolesAnteriores = $user->getRoleNames()->all();
 
-        $user->update($data);
+        try {
+            $user->update($data);
+        } catch (Throwable $e) {
+            User::borrarFoto($fotoNueva);
+            throw $e;
+        }
+
+        if ($fotoNueva && $fotoAnterior !== $fotoNueva) {
+            User::borrarFoto($fotoAnterior);
+        }
         $user->syncRoles($request->input('roles', []));
         $bitacora->registrarCambioRelacion($user, 'usuarios', 'roles', $rolesAnteriores, $user->getRoleNames()->all());
 
@@ -126,6 +156,15 @@ class UserController extends Controller
         return Pdf::loadView('pdf.usuarios', compact('users', 'filtros'))
             ->setPaper('letter', 'landscape')
             ->stream('usuarios_'.now()->format('Ymd_His').'.pdf');
+    }
+
+    private function guardarFoto(UserRequest $request): ?string
+    {
+        if (! $request->hasFile('photo')) {
+            return null;
+        }
+
+        return $request->file('photo')->store(User::PHOTO_DIRECTORY, 'public');
     }
 
     private function filteredQuery(Request $request): Builder

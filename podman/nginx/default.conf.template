@@ -3,6 +3,10 @@ server {
     listen [::]:80;
     server_name _;
 
+    # DNS de la red de Podman: "app" se vuelve a resolver si el contenedor cambia de IP.
+    resolver ${NGINX_LOCAL_RESOLVERS} valid=10s ipv6=off;
+    set $php_upstream app:9000;
+
     root /var/www/html/public;
     index index.php;
     charset utf-8;
@@ -26,7 +30,7 @@ server {
     location = /robots.txt  { access_log off; log_not_found off; }
 
     location ~ ^/index\.php(/|$) {
-        fastcgi_pass app:9000;
+        fastcgi_pass $php_upstream;
         fastcgi_split_path_info ^(.+\.php)(/.*)$;
         include fastcgi_params;
         fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;

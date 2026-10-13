@@ -1,6 +1,25 @@
 @csrf
 
 <div class="row g-3">
+    <div class="col-12">
+        <label for="photo" class="form-label">Foto</label>
+        <div class="d-flex align-items-center gap-3">
+            <img src="{{ $user->photoUrl() }}" alt="Foto de {{ $user->name ?: 'usuario' }}" id="photo-preview"
+                 class="rounded-circle border object-fit-cover" width="72" height="72">
+            <div class="flex-grow-1">
+                <input type="file" id="photo" name="photo" accept="image/jpeg,image/png,image/webp,image/gif"
+                       class="form-control @error('photo') is-invalid @enderror">
+                @error('photo')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                <div class="form-text">
+                    JPG, PNG, WEBP o GIF. Máximo 2 MB.
+                    @if ($user->exists && $user->path_photo)
+                        Al guardar otra imagen se reemplaza la foto actual.
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="col-md-6">
         <label for="name" class="form-label">Nombre <span class="text-danger">*</span></label>
         <input type="text" id="name" name="name" value="{{ old('name', $user->name) }}"
@@ -54,3 +73,18 @@
         <i class="bi bi-save"></i> Guardar
     </button>
 </div>
+
+@push('scripts')
+    <script>
+        document.getElementById('photo')?.addEventListener('change', (event) => {
+            const file = event.target.files?.[0];
+            const preview = document.getElementById('photo-preview');
+
+            if (!file || !preview) {
+                return;
+            }
+
+            preview.src = URL.createObjectURL(file);
+        });
+    </script>
+@endpush

@@ -9,7 +9,7 @@
 
     <div class="card">
         <div class="card-body">
-            <form method="POST" action="{{ route('admin.usuarios.update', $user) }}" autocomplete="off">
+            <form method="POST" action="{{ route('admin.usuarios.update', $user) }}" enctype="multipart/form-data" autocomplete="off">
                 @method('PUT')
                 @include('admin.usuarios._form')
             </form>
