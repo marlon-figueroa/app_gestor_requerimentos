@@ -1,0 +1,236 @@
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+// Layout de invitado (login, registro, recuperar contrasena)
+.guest-content {
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
+    padding-block: $spacer * 1.5;
+}
+
+// Layout del sistema: sidebar | (topbar / content / footer)
+:root {
+    --app-sidebar-bg: #{$navy-dark};
+}
+
+:root[data-bs-theme='dark'] {
+    --app-sidebar-bg: #{$navy-darker};
+}
+
+.app-wrapper {
+    flex: 1 0 auto;
+    display: flex;
+    min-height: 100vh;
+}
+
+.app-sidebar {
+    flex: 0 0 auto;
+
+    @include media-breakpoint-up(lg) {
+        position: sticky;
+        top: 0;
+        align-self: flex-start;
+        width: $sidebar-width;
+        height: 100vh;
+        overflow-y: auto;
+        background-color: var(--app-sidebar-bg);
+        @include transition(margin-left 0.2s ease-in-out, visibility 0.2s);
+
+        .sidebar-collapsed & {
+            margin-left: -$sidebar-width;
+            visibility: hidden;
+        }
+    }
+}
+
+.app-sidebar-panel {
+    --bs-offcanvas-width: #{$sidebar-width};
+    --bs-offcanvas-bg: var(--app-sidebar-bg);
+    --bs-offcanvas-border-width: 0;
+}
+
+.app-sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    height: $topbar-height;
+    padding: 0 $spacer;
+    border-bottom: 1px solid rgba($white, 0.1);
+
+    > a {
+        min-width: 0;
+    }
+
+    .feather {
+        color: $sidebar-icon-color;
+    }
+}
+
+.app-sidebar-nav {
+    padding: $spacer * 0.75;
+
+    .nav {
+        gap: 0.125rem;
+    }
+
+    .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.55rem 0.75rem;
+        border-radius: $border-radius;
+        color: rgba($white, 0.75);
+
+        .app-sidebar-icon {
+            width: 1.15rem;
+            height: 1.15rem;
+        }
+
+        .feather {
+            color: $sidebar-icon-color;
+        }
+
+        &:hover,
+        &:focus-visible {
+            color: $white;
+            background-color: rgba($white, 0.08);
+        }
+
+        &.active {
+            color: $white;
+            background-color: $primary;
+
+            .feather {
+                color: $white;
+            }
+        }
+    }
+
+    // Árbol: ramas colapsables y sangría por nivel
+    .app-sidebar-branch {
+        border: 0;
+        background: none;
+        text-align: start;
+
+        &:not(.collapsed) {
+            color: $white;
+        }
+
+        .app-sidebar-chevron {
+            width: 1rem;
+            height: 1rem;
+            color: rgba($white, 0.5);
+            @include transition(transform 0.2s ease-in-out);
+        }
+
+        &:not(.collapsed) .app-sidebar-chevron {
+            transform: rotate(90deg);
+        }
+    }
+
+    .app-sidebar-submenu {
+        margin: 0.125rem 0 0.25rem calc(0.75rem + 0.575rem);
+        padding-left: 0.5rem;
+        border-left: 1px solid rgba($white, 0.12);
+
+        .nav-link {
+            padding-block: 0.45rem;
+            font-size: 0.925rem;
+        }
+    }
+}
+
+.app-main {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.app-topbar {
+    position: sticky;
+    top: 0;
+    z-index: $zindex-sticky;
+    height: $topbar-height;
+    padding-block: 0;
+}
+
+.app-sidebar-toggle {
+    --bs-btn-color: #{$sidebar-icon-color};
+    --bs-btn-hover-color: #{$white};
+    --bs-btn-active-color: #{$white};
+    font-size: 1.35rem;
+    line-height: 1;
+}
+
+.app-content {
+    flex: 1 0 auto;
+    padding-block: $spacer * 1.5;
+}
+
+.login-card {
+    $avatar-size: 6rem;
+
+    margin-top: $avatar-size * 0.5;
+
+    .login-avatar {
+        width: $avatar-size;
+        height: $avatar-size;
+        margin-top: $avatar-size * -0.5;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 0.25rem solid var(--app-surface);
+        box-shadow: $box-shadow-sm;
+        background-color: var(--app-surface);
+    }
+}
+
+.navbar-brand {
+    font-weight: 700;
+}
+
+.bg-navy {
+    background-color: $navy !important;
+
+    [data-bs-theme='dark'] & {
+        background-color: $navy-dark !important;
+    }
+}
+
+.card {
+    border: 0;
+    box-shadow: $box-shadow-sm;
+}
+
+.card-header {
+    font-weight: 600;
+}
+
+.stat-card .stat-icon {
+    font-size: 2.5rem;
+    opacity: 0.75;
+}
+
+// Pulse y Log Viewer incrustados en las pestañas de la bitácora
+.panel-embebido {
+    display: block;
+    width: 100%;
+    height: calc(100vh - 17rem);
+    min-height: 35rem;
+    border: 0;
+    border-radius: 0 0 var(--bs-card-inner-border-radius) var(--bs-card-inner-border-radius);
+    background-color: var(--app-surface);
+}
+
+table.dataTable td.acciones {
+    white-space: nowrap;
+    width: 1%;
+}
+
+.select2-container--bootstrap-5 .select2-selection {
+    min-height: $input-height;
+}

@@ -1,0 +1,56 @@
+@csrf
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <label for="name" class="form-label">Nombre <span class="text-danger">*</span></label>
+        <input type="text" id="name" name="name" value="{{ old('name', $user->name) }}"
+               class="form-control @error('name') is-invalid @enderror" required autofocus>
+        @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
+    </div>
+
+    <div class="col-md-6">
+        <label for="email" class="form-label">Correo electrónico <span class="text-danger">*</span></label>
+        <input type="email" id="email" name="email" value="{{ old('email', $user->email) }}"
+               class="form-control @error('email') is-invalid @enderror" required>
+        @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
+    </div>
+
+    <div class="col-md-6">
+        <label for="password" class="form-label">
+            Contraseña @unless ($user->exists)<span class="text-danger">*</span>@endunless
+        </label>
+        <input type="password" id="password" name="password" autocomplete="new-password"
+               class="form-control @error('password') is-invalid @enderror" @unless ($user->exists) required @endunless>
+        @error('password')<div class="invalid-feedback">{{ $message }}</div>@enderror
+        @if ($user->exists)
+            <div class="form-text">Déjela en blanco para conservar la contraseña actual.</div>
+        @endif
+    </div>
+
+    <div class="col-md-6">
+        <label for="password_confirmation" class="form-label">Confirmar contraseña</label>
+        <input type="password" id="password_confirmation" name="password_confirmation" autocomplete="new-password" class="form-control">
+    </div>
+
+    <div class="col-12">
+        <label for="roles" class="form-label">Roles</label>
+        @php($selectedRoles = old('roles', $user->exists ? $user->getRoleNames()->all() : []))
+        <select id="roles" name="roles[]" multiple data-placeholder="Seleccione uno o varios roles"
+                class="form-select select2 @error('roles') is-invalid @enderror @error('roles.*') is-invalid @enderror">
+            @foreach ($roles as $rol)
+                <option value="{{ $rol }}" @selected(in_array($rol, $selectedRoles))>{{ $rol }}</option>
+            @endforeach
+        </select>
+        @error('roles')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+        @error('roles.*')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+    </div>
+</div>
+
+<div class="d-flex justify-content-end gap-2 mt-4">
+    <a href="{{ route('admin.usuarios.index') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> {{ __('Cancel') }}
+    </a>
+    <button type="submit" class="btn btn-primary">
+        <i class="bi bi-save"></i> Guardar
+    </button>
+</div>

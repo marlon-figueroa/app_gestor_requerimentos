@@ -1,0 +1,34 @@
+// Fuentes
+@import url('https://fonts.bunny.net/css?family=Nunito:400,600,700');
+
+// Variables
+@import 'variables';
+
+// Bootstrap
+@import 'bootstrap/scss/bootstrap';
+
+// Bootstrap Icons
+@import 'bootstrap-icons/font/bootstrap-icons';
+
+// Themify Icons (ti-*) e IcoFont (icofont-*)
+@import '@icon/themify-icons/themify-icons';
+@import '@icon/icofont/icofont';
+@import 'icons';
+
+// Select2 + tema Bootstrap 5
+@import 'select2/dist/css/select2.css';
+@import 'select2-bootstrap-5-theme/dist/select2-bootstrap-5-theme.css';
+
+// DataTables + Responsive (Bootstrap 5)
+@import 'datatables.net-bs5/css/dataTables.bootstrap5.css';
+@import 'datatables.net-responsive-bs5/css/responsive.bootstrap5.css';
+
+// SweetAlert2
+@import 'sweetalert2/dist/sweetalert2.css';
+
+// Tempus Dominus
+@import '@eonasdan/tempus-dominus/dist/css/tempus-dominus.css';
+
+// Estilos propios
+@import 'custom';
+@import 'theme';

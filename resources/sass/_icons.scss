@@ -1,0 +1,42 @@
+// Themify e IcoFont: los paquetes @icon/* exigen la clase base (.ti / .icofont);
+// estas reglas permiten usar solo la clase del icono (<i class="ti-user">), como en las librerias originales.
+%icon-font-base {
+    display: inline-block;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: normal !important;
+    line-height: 1;
+    text-transform: none;
+    vertical-align: -0.125em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+[class^='ti-'],
+[class*=' ti-'] {
+    @extend %icon-font-base;
+    font-family: 'themify-icons' !important;
+}
+
+[class^='icofont-'],
+[class*=' icofont-'] {
+    @extend %icon-font-base;
+    font-family: 'icofont' !important;
+}
+
+// Feather: SVG generados por feather.replace(); se dimensionan como los iconos de fuente.
+// El <i data-feather> reserva el mismo espacio mientras carga el JS para evitar saltos.
+i[data-feather] {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    vertical-align: -0.125em;
+    flex-shrink: 0;
+}
+
+svg.feather {
+    width: 1em;
+    height: 1em;
+    vertical-align: -0.125em;
+    flex-shrink: 0;
+}

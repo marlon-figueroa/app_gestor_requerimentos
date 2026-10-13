@@ -1,0 +1,135 @@
+// Modos de color (data-bs-theme="light" | "dark" en <html>).
+
+:root,
+[data-bs-theme='light'] {
+    --app-surface: #{$white};
+}
+
+[data-bs-theme='dark'] {
+    --app-surface: #{$gray-900};
+}
+
+// Transicion suave al cambiar de tema (se omite si el usuario prefiere menos movimiento).
+@media (prefers-reduced-motion: no-preference) {
+    body,
+    .card,
+    .navbar,
+    .form-control,
+    .form-select,
+    .select2-selection {
+        transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    }
+}
+
+.theme-toggle .dropdown-item.active .bi-check2 {
+    display: inline-block !important;
+}
+
+// Select2 (tema bootstrap-5 compilado con colores fijos): se enlaza a las variables de Bootstrap.
+.select2-container--bootstrap-5 {
+    .select2-selection {
+        color: var(--bs-body-color);
+        background-color: var(--app-surface);
+        border-color: var(--bs-border-color);
+    }
+
+    .select2-selection--single .select2-selection__rendered {
+        color: var(--bs-body-color);
+    }
+
+    .select2-selection--single .select2-selection__rendered .select2-selection__placeholder {
+        color: var(--bs-secondary-color);
+    }
+
+    .select2-selection--multiple .select2-selection__rendered .select2-selection__choice {
+        color: var(--bs-body-color);
+        border-color: var(--bs-border-color);
+    }
+
+    .select2-selection--multiple .select2-search .select2-search__field {
+        color: var(--bs-body-color);
+    }
+
+    .select2-dropdown {
+        color: var(--bs-body-color);
+        background-color: var(--app-surface);
+    }
+
+    .select2-dropdown .select2-search .select2-search__field {
+        color: var(--bs-body-color);
+        background-color: var(--app-surface);
+        border-color: var(--bs-border-color);
+    }
+
+    .select2-dropdown .select2-results__options .select2-results__option.select2-results__option--highlighted {
+        color: var(--bs-emphasis-color);
+        background-color: var(--bs-tertiary-bg);
+    }
+
+    .select2-dropdown .select2-results__options .select2-results__option.select2-results__message,
+    .select2-dropdown .select2-results__options .select2-results__option[role='group'] .select2-results__group {
+        color: var(--bs-secondary-color);
+    }
+
+    &.select2-container--disabled .select2-selection {
+        color: var(--bs-secondary-color);
+        background-color: var(--bs-secondary-bg);
+    }
+}
+
+[data-bs-theme='dark'] .select2-container--bootstrap-5 {
+    .select2-selection--single {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23dee2e6' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    }
+
+    .select2-selection__clear,
+    .select2-selection__choice__remove {
+        filter: invert(1) grayscale(100%) brightness(200%);
+    }
+}
+
+// Tempus Dominus: sus variables apuntan a las de Bootstrap, asi sigue el tema activo.
+:root,
+[data-bs-theme] {
+    --td-light: var(--app-surface);
+    --td-widget-background: var(--app-surface);
+    --td-font-color: var(--bs-body-color);
+    --td-active-bg: var(--bs-primary);
+    --td-active-color: #{$white};
+    --td-active-border-color: var(--app-surface);
+    --td-primary-border-color: var(--app-surface);
+    --td-btn-hover-bg: var(--bs-tertiary-bg);
+    --td-disabled-color: var(--bs-secondary-color);
+    --td-alternate-color: var(--bs-tertiary-color);
+    --td-secondary-border-color: var(--bs-border-color);
+    --td-secondary-border-color-rgba: var(--bs-border-color-translucent);
+    --td-dow-color: var(--bs-secondary-color);
+}
+
+// SweetAlert2: mismas superficies, textos y bordes que Bootstrap en ambos temas.
+:root,
+[data-bs-theme] {
+    --swal2-background: var(--app-surface);
+    --swal2-color: var(--bs-body-color);
+    --swal2-border-radius: var(--bs-border-radius-lg);
+    --swal2-backdrop: rgba(0, 0, 0, 0.5);
+    --swal2-input-background: var(--app-surface);
+    --swal2-input-border: 1px solid var(--bs-border-color);
+    --swal2-footer-border-color: var(--bs-border-color);
+    --swal2-close-button-color: var(--bs-secondary-color);
+    --swal2-validation-message-background: var(--bs-tertiary-bg);
+    --swal2-validation-message-color: var(--bs-body-color);
+    --swal2-timer-progress-bar-background: var(--bs-primary-border-subtle);
+}
+
+.swal2-popup {
+    font-size: 0.95rem;
+}
+
+.swal2-popup.swal2-toast {
+    border: 1px solid var(--bs-border-color-translucent);
+}
+
+.swal2-title {
+    color: var(--bs-emphasis-color);
+}
