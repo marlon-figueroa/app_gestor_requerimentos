@@ -1,0 +1,98 @@
+.twin-orbit {
+    --duration: 1.2s;
+    --size: 2.5rem;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: calc(var(--size) * 1.85);
+    height: var(--size);
+    color: currentColor;
+
+    &--sm {
+        --size: 1.5rem;
+    }
+
+    &--md {
+        --size: 2rem;
+    }
+
+    &--lg {
+        --size: 2.75rem;
+    }
+
+    &__center {
+        position: absolute;
+        z-index: 1;
+        width: calc(var(--size) * 0.2);
+        height: calc(var(--size) * 0.2);
+        border-radius: 50%;
+        background-color: currentColor;
+    }
+
+    &__marker {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: calc(var(--size) * 0.16);
+        height: calc(var(--size) * 0.16);
+        margin: calc(var(--size) * -0.08);
+        border-radius: 50%;
+        background-color: currentColor;
+        animation: twin-orbit-spin var(--duration) linear infinite;
+    }
+
+    &__marker--offset {
+        animation-delay: calc(var(--duration) * -0.5);
+    }
+}
+
+@keyframes twin-orbit-spin {
+    from {
+        transform: rotate(0deg) translateX(calc(var(--size) * 0.45)) rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg) translateX(calc(var(--size) * 0.45)) rotate(-360deg);
+    }
+}
+
+.app-loading-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1050;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background-color: rgba(0, 0, 0, 0.35);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.15s ease, visibility 0.15s ease;
+
+    &.is-active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    &__panel {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.5rem 2rem;
+        border-radius: var(--bs-border-radius-lg);
+        background-color: var(--app-surface);
+        box-shadow: var(--bs-box-shadow);
+    }
+
+    &__label {
+        margin: 0;
+        font-size: 0.95rem;
+        color: var(--bs-secondary-color);
+    }
+}
+
+[data-bs-theme='dark'] .app-loading-overlay {
+    background-color: rgba(0, 0, 0, 0.55);
+}

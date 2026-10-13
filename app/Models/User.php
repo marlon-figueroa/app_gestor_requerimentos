@@ -6,6 +6,7 @@ namespace App\Models;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Traits\HasRoles;
@@ -62,10 +63,24 @@ class User extends Authenticatable
         });
     }
 
+    /**
+     * Guarda la imagen en el disco public y devuelve la ruta relativa
+     * (usuarios/fotos/{nombre}) que debe persistirse en path_photo.
+     */
+    public static function guardarFotoSubida(UploadedFile $file): string
+    {
+        $nombre = $file->hashName();
+        $file->storeAs(self::PHOTO_DIRECTORY, $nombre, 'public');
+
+        return self::PHOTO_DIRECTORY.'/'.$nombre;
+    }
+
     public function photoUrl(): string
     {
-        if (filled($this->path_photo)) {
-            return Storage::disk('public')->url($this->path_photo);
+        $ruta = self::normalizarRutaFoto($this->path_photo);
+
+        if ($ruta !== null && Storage::disk('public')->exists($ruta)) {
+            return Storage::disk('public')->url($ruta);
         }
 
         return asset('image/user_image.png');
@@ -73,8 +88,32 @@ class User extends Authenticatable
 
     public static function borrarFoto(?string $ruta): void
     {
-        if (filled($ruta) && str_starts_with($ruta, self::PHOTO_DIRECTORY.'/')) {
+        $ruta = self::normalizarRutaFoto($ruta);
+
+        if ($ruta !== null && Storage::disk('public')->exists($ruta)) {
             Storage::disk('public')->delete($ruta);
         }
+    }
+
+    /**
+     * path_photo debe ser la ruta relativa al disco public (carpeta + nombre aleatorio).
+     */
+    public static function normalizarRutaFoto(?string $ruta): ?string
+    {
+        if (! filled($ruta)) {
+            return null;
+        }
+
+        $ruta = str_replace('\\', '/', trim($ruta));
+
+        if (str_starts_with($ruta, self::PHOTO_DIRECTORY.'/')) {
+            return $ruta;
+        }
+
+        if (! str_contains($ruta, '/')) {
+            return self::PHOTO_DIRECTORY.'/'.$ruta;
+        }
+
+        return $ruta;
     }
 }

@@ -26,6 +26,7 @@
     "dependencies": {
         "@icon/icofont": "^1.0.1-alpha.1",
         "@icon/themify-icons": "^1.0.1-alpha.3",
+        "dropzone": "^6.3.5",
         "feather-icons": "^4.29.2",
         "sweetalert2": "^11.26.25"
     }

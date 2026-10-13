@@ -94,7 +94,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="text-center py-4 text-muted"><div class="spinner-border" role="status"></div></div>
+                    <p class="text-center text-muted py-4 mb-0">Cargando…</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ __('Close') }}</button>

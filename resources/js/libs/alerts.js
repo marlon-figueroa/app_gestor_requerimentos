@@ -29,28 +29,26 @@ const Dialog = Swal.mixin({
     },
 });
 
-const Toast = Swal.mixin({
-    toast: true,
-    position: 'top-end',
-    showConfirmButton: false,
-    showCloseButton: true,
-    closeButtonAriaLabel: 'Cerrar',
-    timer: 4000,
-    timerProgressBar: true,
-    didOpen: (toast) => {
-        toast.addEventListener('mouseenter', Swal.stopTimer);
-        toast.addEventListener('mouseleave', Swal.resumeTimer);
-    },
-});
-
 const icon = (type) => ICONS[type] ?? 'info';
 
+const TITULOS = {
+    success: 'Éxito',
+    error: 'Error',
+    danger: 'Error',
+    warning: 'Aviso',
+    info: 'Información',
+};
+
+function tituloPorTipo(type) {
+    return TITULOS[type] ?? TITULOS.info;
+}
+
 /**
- * Notificacion breve en la esquina superior derecha.
+ * Notificacion modal con titulo segun el tipo y el mensaje en el cuerpo.
  * notify('Guardado', 'success' | 'error' | 'danger' | 'warning' | 'info')
  */
 export function notify(message, type = 'success') {
-    return Toast.fire({ icon: icon(type), title: message });
+    return alertMessage({ title: tituloPorTipo(type), text: message, type });
 }
 
 /**
@@ -131,13 +129,12 @@ function showFlashMessages() {
         contenido.appendChild(linea);
     });
 
-    // Los errores se muestran como modal para que no pasen desapercibidos; el resto como toast.
-    if (tipo === 'error' || tipo === 'danger') {
-        alertMessage({ title: 'Ocurrió un error', html: contenido, type: 'error' });
-    } else if (messages.length === 1) {
-        notify(messages[0].message, tipo);
+    const title = tituloPorTipo(tipo);
+
+    if (messages.length === 1) {
+        alertMessage({ title, text: messages[0].message, type: tipo });
     } else {
-        Toast.fire({ icon: icon(tipo), html: contenido, timer: 6000 });
+        alertMessage({ title, html: contenido, type: tipo });
     }
 }
 

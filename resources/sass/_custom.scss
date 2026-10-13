@@ -234,3 +234,134 @@ table.dataTable td.acciones {
 .select2-container--bootstrap-5 .select2-selection {
     min-height: $input-height;
 }
+
+.photo-dropzone {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 8.5rem;
+    padding: 1.25rem;
+    border: 1px dashed var(--bs-border-color);
+    border-radius: var(--bs-border-radius);
+    background-color: var(--bs-tertiary-bg);
+    color: var(--bs-body-color);
+
+    &.dz-drag-hover,
+    &:focus-within {
+        border-color: var(--bs-primary);
+        background-color: rgba(var(--bs-primary-rgb), 0.08);
+    }
+
+    &.is-invalid {
+        border-color: var(--bs-danger);
+    }
+
+    .dz-message {
+        margin: 0;
+    }
+
+    .dz-button {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.35rem;
+        color: var(--bs-secondary-color);
+    }
+
+    .photo-dropzone-icon {
+        color: var(--bs-primary);
+        font-size: 1.75rem;
+        line-height: 1;
+    }
+
+    .dz-preview {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0.25rem 0.75rem;
+    }
+
+    .dz-preview .dz-image {
+        border-radius: 50%;
+    }
+
+    .dz-preview .dz-details {
+        position: static;
+        opacity: 1;
+        min-width: 0;
+        max-width: 10rem;
+        padding: 0.35rem 0 0;
+        color: var(--bs-body-color);
+    }
+
+    .dz-preview .dz-details .dz-size {
+        margin-bottom: 0.15rem;
+        font-size: 0.75rem;
+    }
+
+    .dz-preview .dz-details .dz-filename span,
+    .dz-preview .dz-details .dz-size span {
+        padding: 0;
+        background-color: transparent;
+        border: 0;
+    }
+
+    .dz-preview:hover .dz-image img {
+        filter: none;
+        transform: none;
+    }
+
+    .dz-preview .dz-error-message {
+        position: static;
+        width: 11rem;
+        margin-top: 0.35rem;
+        padding: 0;
+        color: var(--bs-danger);
+        text-align: center;
+        background: transparent;
+        opacity: 1;
+    }
+
+    .dz-preview .dz-error-message::after {
+        display: none;
+    }
+
+    .dz-preview .dz-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .dz-preview.dz-image-preview {
+        background: transparent;
+    }
+
+    .dz-preview .dz-progress,
+    .dz-preview .dz-success-mark {
+        display: none;
+    }
+
+    .dz-existing .dz-size {
+        display: none;
+    }
+
+    .dz-preview .dz-remove {
+        margin-top: 0.35rem;
+        color: var(--bs-primary);
+    }
+}
+
+.photo-dropzone-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}

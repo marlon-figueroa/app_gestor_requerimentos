@@ -88,7 +88,7 @@ if (tableEl) {
     const modalEl = document.getElementById('modal-bitacora');
     const modal = window.bootstrap.Modal.getOrCreateInstance(modalEl);
     const modalBody = modalEl.querySelector('.modal-body');
-    const spinner = modalBody.innerHTML;
+    const loadingPlaceholder = '<p class="text-center text-muted py-4 mb-0">Cargando…</p>';
 
     const table = serverTable(tableEl, {
         url: tableEl.dataset.url,
@@ -133,7 +133,7 @@ if (tableEl) {
             return;
         }
 
-        modalBody.innerHTML = spinner;
+        modalBody.innerHTML = loadingPlaceholder;
         modal.show();
 
         window.axios

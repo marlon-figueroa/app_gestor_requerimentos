@@ -21,7 +21,7 @@ DataTable.util.object.assignDeep(DataTable.defaults, {
  */
 export function serverTable(selector, { url, columns, order = [[0, 'asc']], extraParams = () => ({}), ...options }) {
     return new DataTable(selector, {
-        processing: true,
+        processing: false,
         serverSide: true,
         order,
         columns,

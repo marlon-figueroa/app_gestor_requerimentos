@@ -1,23 +1,21 @@
 @csrf
 
 <div class="row g-3">
-    <div class="col-12">
-        <label for="photo" class="form-label">Foto</label>
-        <div class="d-flex align-items-center gap-3">
-            <img src="{{ $user->photoUrl() }}" alt="Foto de {{ $user->name ?: 'usuario' }}" id="photo-preview"
-                 class="rounded-circle border object-fit-cover" width="72" height="72">
-            <div class="flex-grow-1">
-                <input type="file" id="photo" name="photo" accept="image/jpeg,image/png,image/webp,image/gif"
-                       class="form-control @error('photo') is-invalid @enderror">
-                @error('photo')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                <div class="form-text">
-                    JPG, PNG, WEBP o GIF. Máximo 2 MB.
-                    @if ($user->exists && $user->path_photo)
-                        Al guardar otra imagen se reemplaza la foto actual.
-                    @endif
-                </div>
-            </div>
+    <div class="col-12 position-relative">
+        <label id="photo-label" class="form-label">Foto</label>
+        <div id="photo-dropzone"
+             class="dropzone photo-dropzone @error('photo') is-invalid @enderror"
+             aria-labelledby="photo-label"
+             @if ($user->exists && $user->path_photo) data-existing-photo="{{ $user->photoUrl() }}" @endif></div>
+        <input type="file" id="photo" name="photo" class="photo-dropzone-input" tabindex="-1"
+               accept="image/jpeg,image/png,image/webp,image/gif" aria-labelledby="photo-label">
+        <div class="form-text" id="photo-help">
+            JPG, PNG, WEBP o GIF. Máximo 2 MB.
+            @if ($user->exists && $user->path_photo)
+                Al guardar otra imagen se reemplaza la foto actual. Quitar la vista previa no la elimina.
+            @endif
         </div>
+        @error('photo')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
     </div>
 
     <div class="col-md-6">
@@ -75,16 +73,5 @@
 </div>
 
 @push('scripts')
-    <script>
-        document.getElementById('photo')?.addEventListener('change', (event) => {
-            const file = event.target.files?.[0];
-            const preview = document.getElementById('photo-preview');
-
-            if (!file || !preview) {
-                return;
-            }
-
-            preview.src = URL.createObjectURL(file);
-        });
-    </script>
+    @vite('resources/js/pages/usuario-form.js')
 @endpush

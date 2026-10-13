@@ -26,9 +26,13 @@
 // SweetAlert2
 @import 'sweetalert2/dist/sweetalert2.css';
 
+// Dropzone
+@import 'dropzone/dist/dropzone.css';
+
 // Tempus Dominus
 @import '@eonasdan/tempus-dominus/dist/css/tempus-dominus.css';
 
 // Estilos propios
 @import 'custom';
 @import 'theme';
+@import 'loading';

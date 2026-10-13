@@ -164,7 +164,7 @@ class UserController extends Controller
             return null;
         }
 
-        return $request->file('photo')->store(User::PHOTO_DIRECTORY, 'public');
+        return User::guardarFotoSubida($request->file('photo'));
     }
 
     private function filteredQuery(Request $request): Builder

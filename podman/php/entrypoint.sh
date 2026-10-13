@@ -11,6 +11,10 @@ artisan() {
 mkdir -p storage/app/public storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs bootstrap/cache
 chown -R www-data:www-data storage bootstrap/cache
 
+if [ ! -e public/storage ]; then
+    artisan storage:link >/dev/null
+fi
+
 if [ "$1" = "php-fpm" ]; then
     if [ "${APP_RUN_MIGRATIONS:-true}" = "true" ]; then
         intentos=0

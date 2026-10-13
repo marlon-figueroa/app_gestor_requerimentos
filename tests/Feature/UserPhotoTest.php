@@ -38,6 +38,21 @@ class UserPhotoTest extends TestCase
         $this->assertNotNull($user->path_photo);
         $this->assertStringStartsWith(User::PHOTO_DIRECTORY.'/', $user->path_photo);
         Storage::disk('public')->assertExists($user->path_photo);
+        $this->assertStringContainsString(basename($user->path_photo), $user->photoUrl());
+        $this->assertSame(
+            $user->path_photo,
+            User::PHOTO_DIRECTORY.'/'.basename($user->path_photo)
+        );
+    }
+
+    public function test_path_photo_solo_con_nombre_resuelve_la_misma_foto(): void
+    {
+        $archivo = UploadedFile::fake()->image('legacy.jpg');
+        $rutaCompleta = User::guardarFotoSubida($archivo);
+        $user = User::factory()->create(['path_photo' => basename($rutaCompleta)]);
+
+        $this->assertStringContainsString(basename($rutaCompleta), $user->photoUrl());
+        Storage::disk('public')->assertExists($rutaCompleta);
     }
 
     public function test_editar_usuario_reemplaza_la_foto_anterior(): void
