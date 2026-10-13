@@ -84,22 +84,3 @@
         </div>
     </div>
 </div>
-
-@push('modals')
-    <div class="modal fade" id="modal-bitacora" tabindex="-1" aria-labelledby="modal-bitacora-titulo" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modal-bitacora-titulo"><i class="bi bi-journal-text me-1"></i> Detalle del registro</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-                <div class="modal-body">
-                    <p class="text-center text-muted py-4 mb-0">Cargando…</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ __('Close') }}</button>
-                </div>
-            </div>
-        </div>
-    </div>
-@endpush

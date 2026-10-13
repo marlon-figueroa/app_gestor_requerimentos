@@ -6,6 +6,7 @@
 @php
     $pestanas = array_filter([
         'registros' => ['label' => 'Registros', 'icon' => 'list', 'visible' => auth()->user()->can('bitacora.ver')],
+        'sesiones' => ['label' => 'Sesiones activas', 'icon' => 'users', 'visible' => auth()->user()->can('bitacora.ver')],
         'monitoreo' => ['label' => 'Monitoreo', 'icon' => 'activity', 'visible' => auth()->user()->can('monitoreo.pulse')],
         'logs' => ['label' => 'Logs', 'icon' => 'file-text', 'visible' => auth()->user()->can('monitoreo.logs')],
     ], fn ($pestana) => $pestana['visible']);
@@ -36,6 +37,7 @@
     <div class="tab-content">
         @can('bitacora.ver')
             @include('admin.bitacora.partials.registros')
+            @include('admin.bitacora.partials.sesiones')
         @endcan
 
         @can('monitoreo.pulse')

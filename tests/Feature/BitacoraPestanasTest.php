@@ -18,13 +18,14 @@ class BitacoraPestanasTest extends TestCase
         $this->seed(RolesAndPermissionsSeeder::class);
     }
 
-    public function test_administrador_ve_las_tres_pestanas(): void
+    public function test_administrador_ve_las_cuatro_pestanas(): void
     {
         $admin = User::factory()->create()->assignRole('Administrador');
 
         $this->actingAs($admin)->get(route('admin.bitacora.index'))
             ->assertOk()
             ->assertSee('id="tab-registros"', false)
+            ->assertSee('id="tab-sesiones"', false)
             ->assertSee('id="tab-monitoreo"', false)
             ->assertSee('id="tab-logs"', false)
             ->assertSee('data-src="'.route('pulse').'"', false)

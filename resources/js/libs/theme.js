@@ -1,7 +1,7 @@
 /**
- * Modos de color de Bootstrap 5.3: "light", "dark" o "auto" (sigue al sistema operativo).
- * La preferencia se guarda en localStorage; el atributo inicial lo aplica el script
- * en linea de partials/theme-script.blade.php para evitar el destello al cargar.
+ * Tema claro u oscuro (Bootstrap 5.3 data-bs-theme). La preferencia va en localStorage;
+ * el script en partials/theme-script.blade.php aplica el valor inicial sin destello.
+ * "auto" en almacenamiento antiguo se interpreta como el tema del sistema hasta que el usuario alterna.
  */
 const STORAGE_KEY = 'theme';
 const THEMES = ['light', 'dark', 'auto'];
@@ -10,13 +10,11 @@ const media = window.matchMedia('(prefers-color-scheme: dark)');
 const ICONS = {
     light: 'bi-sun-fill',
     dark: 'bi-moon-stars-fill',
-    auto: 'bi-circle-half',
 };
 
 const LABELS = {
     light: 'Claro',
     dark: 'Oscuro',
-    auto: 'Automático',
 };
 
 export function getStoredTheme() {
@@ -48,23 +46,26 @@ function applyTheme(theme) {
     document.dispatchEvent(new CustomEvent('theme:changed', { detail: { theme, resolved } }));
 }
 
-function showActiveTheme(theme) {
+function showActiveTheme(theme = getStoredTheme()) {
+    const resolved = resolveTheme(theme);
+    const iconClass = ICONS[resolved];
+
     document.querySelectorAll('[data-theme-toggle-icon]').forEach((icon) => {
-        icon.classList.remove(...Object.values(ICONS));
-        icon.classList.add(ICONS[theme]);
+        icon.classList.remove(ICONS.light, ICONS.dark);
+        icon.classList.add(iconClass);
     });
 
     document.querySelectorAll('[data-theme-toggle-button]').forEach((button) => {
-        button.setAttribute('aria-label', `Cambiar tema (actual: ${LABELS[theme]})`);
-        button.setAttribute('title', `Tema: ${LABELS[theme]}`);
-    });
+        const siguiente = resolved === 'dark' ? 'light' : 'dark';
 
-    document.querySelectorAll('[data-bs-theme-value]').forEach((item) => {
-        const active = item.dataset.bsThemeValue === theme;
-
-        item.classList.toggle('active', active);
-        item.setAttribute('aria-pressed', String(active));
+        button.setAttribute('aria-label', `Tema ${LABELS[resolved]}. Cambiar a ${LABELS[siguiente]}.`);
+        button.setAttribute('title', `Tema ${LABELS[resolved]}`);
+        button.setAttribute('aria-pressed', resolved === 'dark' ? 'true' : 'false');
     });
+}
+
+function toggleTheme() {
+    setTheme(resolveTheme() === 'dark' ? 'light' : 'dark');
 }
 
 export function setTheme(theme) {
@@ -96,11 +97,11 @@ export function initTheme() {
     });
 
     document.addEventListener('click', (event) => {
-        const item = event.target.closest('[data-bs-theme-value]');
+        const button = event.target.closest('[data-theme-toggle-button]');
 
-        if (item) {
+        if (button) {
             event.preventDefault();
-            setTheme(item.dataset.bsThemeValue);
+            toggleTheme();
         }
     });
 }

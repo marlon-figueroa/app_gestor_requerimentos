@@ -6,10 +6,12 @@ use App\Http\Controllers\Concerns\FiltraPorFechas;
 use App\Http\Controllers\Controller;
 use App\Models\Bitacora;
 use App\Models\User;
+use App\Models\UserSession;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 use Yajra\DataTables\Facades\DataTables;
 
 class BitacoraController extends Controller
@@ -25,7 +27,7 @@ class BitacoraController extends Controller
     {
         // La pantalla agrupa Registros, Monitoreo (Pulse) y Logs; cada pestaña se muestra segun su permiso.
         $this->middleware('permission:bitacora.ver|monitoreo.pulse|monitoreo.logs')->only('index');
-        $this->middleware('permission:bitacora.ver')->only(['data', 'show']);
+        $this->middleware('permission:bitacora.ver')->only(['data', 'show', 'sessionsData', 'showSesion']);
         $this->middleware('permission:bitacora.exportar')->only('pdf');
     }
 
@@ -51,35 +53,47 @@ class BitacoraController extends Controller
             ->toJson();
     }
 
-    public function show(Bitacora $bitacora): JsonResponse
+    public function sessionsData(Request $request): JsonResponse
+    {
+        return DataTables::eloquent(
+            UserSession::query()->activas()->with('user:id,name,email')
+        )
+            ->orderColumn('last_activity', 'last_activity $1')
+            ->editColumn('last_activity', fn (UserSession $sesion) => $sesion->last_activity_at?->format('d/m/Y H:i:s'))
+            ->addColumn('usuario_nombre', fn (UserSession $sesion) => $sesion->user?->name ?? '—')
+            ->addColumn('cliente', fn (UserSession $sesion) => $sesion->resumenCliente() ?: '—')
+            ->addColumn('acciones', fn (UserSession $sesion) => view('admin.bitacora.partials.sesion-acciones', [
+                'sesion' => $sesion,
+            ])->render())
+            ->rawColumns(['acciones'])
+            ->toJson();
+    }
+
+    public function showSesion(string $sesion): View
+    {
+        $sesionActiva = UserSession::query()->activas()->with('user:id,name,email')->find($sesion);
+
+        if (! $sesionActiva) {
+            abort(404, 'La sesión no existe o ya expiró.');
+        }
+
+        $eventos = Bitacora::query()
+            ->where('sesion_id', $sesion)
+            ->orderBy('created_at')
+            ->orderBy('id')
+            ->get();
+
+        return view('admin.bitacora.sesion', [
+            'sesion' => $sesionActiva,
+            'eventos' => $eventos,
+        ]);
+    }
+
+    public function show(Bitacora $bitacora): View
     {
         $bitacora->load('usuario:id,name,email');
 
-        return response()->json([
-            'id' => $bitacora->id,
-            'fecha' => $bitacora->created_at?->format('d/m/Y H:i:s'),
-            'usuario' => $bitacora->usuario ? "{$bitacora->usuario->name} ({$bitacora->usuario->email})" : 'Invitado / sistema',
-            'tipo_accion' => Bitacora::etiquetaTipoAccion($bitacora->tipo_accion),
-            'accion' => $bitacora->accion,
-            'descripcion' => $bitacora->descripcion,
-            'modulo' => $bitacora->modulo,
-            'modelo' => $bitacora->modelo_type ? class_basename($bitacora->modelo_type)." #{$bitacora->modelo_id}" : null,
-            'exitoso' => $bitacora->exitoso,
-            'error_mensaje' => $bitacora->error_mensaje,
-            'status_code' => $bitacora->status_code,
-            'metodo_http' => $bitacora->metodo_http,
-            'ruta' => $bitacora->ruta,
-            'ip_address' => $bitacora->ip_address,
-            'navegador' => $bitacora->navegador,
-            'sistema_operativo' => $bitacora->sistema_operativo,
-            'dispositivo' => $bitacora->dispositivo,
-            'tiempo_ejecucion' => $bitacora->tiempo_ejecucion,
-            'user_agent' => $bitacora->user_agent,
-            'valores_anteriores' => $bitacora->valores_anteriores,
-            'valores_nuevos' => $bitacora->valores_nuevos,
-            'datos_adicionales' => $bitacora->datos_adicionales,
-            'tags' => $bitacora->tags,
-        ]);
+        return view('admin.bitacora.show', compact('bitacora'));
     }
 
     public function pdf(Request $request)

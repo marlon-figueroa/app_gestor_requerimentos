@@ -27,6 +27,10 @@ Route::middleware('auth')->group(function () {
 
         Route::get('bitacora', [BitacoraController::class, 'index'])->name('bitacora.index');
         Route::post('bitacora/data', [BitacoraController::class, 'data'])->name('bitacora.data');
+        Route::post('bitacora/sesiones/data', [BitacoraController::class, 'sessionsData'])->name('bitacora.sesiones.data');
+        Route::get('bitacora/sesiones/{sesion}', [BitacoraController::class, 'showSesion'])
+            ->name('bitacora.sesiones.show')
+            ->where('sesion', '[a-zA-Z0-9]+');
         Route::get('bitacora/pdf', [BitacoraController::class, 'pdf'])->name('bitacora.pdf');
         Route::get('bitacora/{bitacora}', [BitacoraController::class, 'show'])->name('bitacora.show');
 
