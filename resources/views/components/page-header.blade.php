@@ -52,15 +52,25 @@
 
     @if ($breadcrumb)
         <nav aria-label="breadcrumb" class="view-header__breadcrumb mt-2">
-            <ol class="breadcrumb small mb-0 justify-content-end flex-wrap">
+            <ol class="view-header__crumbs list-unstyled d-flex flex-wrap align-items-center justify-content-end gap-1 mb-0 small">
                 @foreach ($crumbs as $crumb)
                     @if (! empty($crumb['active']))
-                        <li class="breadcrumb-item active" aria-current="page">{{ $crumb['label'] }}</li>
+                        <li class="view-header__crumb view-header__crumb--active" aria-current="page">{{ $crumb['label'] }}</li>
                     @elseif (! empty($crumb['url']))
-                        <li class="breadcrumb-item"><a href="{{ $crumb['url'] }}">{{ $crumb['label'] }}</a></li>
+                        <li class="view-header__crumb">
+                            <a href="{{ $crumb['url'] }}">
+                                @if ($crumb['label'] === 'Inicio')
+                                    <i class="bi bi-house-door me-1" aria-hidden="true"></i>
+                                @endif
+                                {{ $crumb['label'] }}
+                            </a>
+                        </li>
                     @else
-                        <li class="breadcrumb-item">{{ $crumb['label'] }}</li>
+                        <li class="view-header__crumb view-header__crumb--muted">{{ $crumb['label'] }}</li>
                     @endif
+                    @unless ($loop->last)
+                        <li class="view-header__crumb-sep" aria-hidden="true"><i class="bi bi-chevron-right"></i></li>
+                    @endunless
                 @endforeach
             </ol>
         </nav>

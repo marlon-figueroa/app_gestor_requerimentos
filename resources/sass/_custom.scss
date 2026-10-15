@@ -376,8 +376,45 @@ table.dataTable td.acciones {
         border-radius: 0.5rem;
     }
 
-    &__breadcrumb .breadcrumb {
-        --bs-breadcrumb-margin-bottom: 0;
+    &__breadcrumb {
+        font-size: 0.8125rem;
+    }
+
+    &__crumb {
+        a {
+            color: var(--bs-secondary-color);
+            text-decoration: none;
+            border-radius: $border-radius-sm;
+            padding: 0.125rem 0.25rem;
+            transition: color 0.15s ease;
+
+            &:hover,
+            &:focus-visible {
+                color: var(--bs-primary);
+            }
+        }
+
+        &--muted {
+            color: var(--bs-secondary-color);
+            padding: 0.125rem 0.25rem;
+        }
+
+        &--active {
+            padding: 0.2rem 0.65rem;
+            border-radius: 50rem;
+            background-color: var(--bs-primary-bg-subtle);
+            color: var(--bs-primary);
+            font-weight: 500;
+        }
+    }
+
+    &__crumb-sep {
+        display: flex;
+        align-items: center;
+        color: var(--bs-border-color);
+        font-size: 0.65rem;
+        user-select: none;
+        padding-inline: 0.1rem;
     }
 }
 

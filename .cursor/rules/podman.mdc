@@ -1,0 +1,14 @@
+---
+description: La app y MySQL corren en Podman, no en un servidor local
+alwaysApply: true
+---
+
+# Entorno Podman
+
+La aplicación no se sirve con `php artisan serve` ni con un MySQL instalado en el host.
+
+- App: contenedores `app` y `nginx` de `compose.yaml`. URL habitual: http://localhost:8080
+- MySQL: contenedor `mysql` (`docker.io/library/mysql:8.4`). Desde el host queda en `127.0.0.1:3307` (`DB_HOST_PORT`). Dentro de la red de Compose, el host es `mysql`.
+- Variables: `podman/env/app.env` y `podman/env/mysql.env`.
+
+No ejecutes `podman compose build` ni `podman compose up --build`. El usuario recompila las imágenes. Única excepción: cuando el usuario invoque la skill `compila-proyecto` por nombre.
