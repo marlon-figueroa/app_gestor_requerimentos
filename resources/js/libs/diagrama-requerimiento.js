@@ -319,6 +319,39 @@ function alinear({ x, y }) {
     };
 }
 
+function centro(nodo) {
+    return { p: nodo.p + nodo.largo / 2, c: nodo.c + nodo.ancho / 2 };
+}
+
+function codo(origen, destino, baja, o) {
+    const avanza = destino.principal > origen.principal;
+    const desde = centro(origen);
+    const hasta = centro(destino);
+
+    if (baja) {
+        const tramoCruzado = Math.abs(hasta.c - (origen.c + origen.ancho));
+        const tramoPrincipal = Math.abs((avanza ? destino.p : destino.p + destino.largo) - desde.p);
+
+        return {
+            source: { anchor: { name: o.finCruzado } },
+            target: { anchor: { name: avanza ? o.inicioPrincipal : o.finPrincipal } },
+            vertices: [vector(o, desde.p, hasta.c)],
+            distanciaEtiqueta: tramoCruzado + tramoPrincipal / 2,
+            desfaseEtiqueta: vector(o, 0, -6),
+        };
+    }
+
+    const tramoPrincipal = Math.abs(hasta.p - (avanza ? origen.p + origen.largo : origen.p));
+
+    return {
+        source: { anchor: { name: avanza ? o.finPrincipal : o.inicioPrincipal } },
+        target: { anchor: { name: o.finCruzado } },
+        vertices: [vector(o, hasta.p, desde.c)],
+        distanciaEtiqueta: tramoPrincipal / 2,
+        desfaseEtiqueta: vector(o, 0, -6),
+    };
+}
+
 function geometria(transicion, { o, ubicaciones }) {
     const origen = ubicaciones.get(transicion.origen);
     const destino = ubicaciones.get(transicion.destino);
@@ -350,6 +383,10 @@ function geometria(transicion, { o, ubicaciones }) {
 
     const baja = destino.cruzado > origen.cruzado;
     const signo = baja ? -1 : 1;
+
+    if (origen.principal !== destino.principal) {
+        return codo(origen, destino, baja, o);
+    }
 
     return {
         source: { anchor: { name: baja ? o.finCruzado : o.inicioCruzado, args: desplazar(o, signo * SEPARACION_PARALELA) } },
@@ -430,7 +467,7 @@ function crearNodo(id, estado, posicion, alcanzado, colores, medida) {
 }
 
 function crearTransicion(transicion, origen, destino, recorrida, disposicion, colores) {
-    const { source, target, vertices, desfaseEtiqueta } = geometria(transicion, disposicion);
+    const { source, target, vertices, desfaseEtiqueta, distanciaEtiqueta = 0.5 } = geometria(transicion, disposicion);
     const color = !recorrida ? colores.borde : transicion.rechazo ? colores.rechazo : colores.linea;
     const etiqueta = transicion.pasos.length > 0
         ? `${transicion.eventos.join(', ')} · #${transicion.pasos.join(' #')}`
@@ -450,7 +487,7 @@ function crearTransicion(transicion, origen, destino, recorrida, disposicion, co
             },
         },
         labels: etiqueta === '' ? [] : [{
-            position: { distance: 0.5, offset: desfaseEtiqueta },
+            position: { distance: distanciaEtiqueta, offset: desfaseEtiqueta },
             attrs: {
                 text: {
                     text: etiqueta,
