@@ -7,6 +7,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Closure;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Collection;
 
 class ProyectoRequest extends FormRequest
 {
@@ -61,7 +62,7 @@ class ProyectoRequest extends FormRequest
     }
 
     /**
-     * @return \Illuminate\Support\Collection<int, User>
+     * @return Collection<int, User>
      */
     public static function responsables()
     {

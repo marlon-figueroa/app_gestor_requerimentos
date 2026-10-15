@@ -152,9 +152,9 @@ class ProyectoController extends Controller
     private function filteredQuery(Request $request): Builder
     {
         return Proyecto::query()
+            ->select('proyectos.*')
             ->with('responsable')
             ->withCount(['requerimientos', 'requerimientosPendientes'])
-            ->select('proyectos.*')
             ->when(
                 EstadoProyecto::tryFrom((string) $request->input('estado')),
                 fn (Builder $q, EstadoProyecto $estado) => $q->where('proyectos.estado', $estado),
