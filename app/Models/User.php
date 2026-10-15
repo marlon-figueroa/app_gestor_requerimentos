@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Notifications\Notifiable;
@@ -84,6 +85,16 @@ class User extends Authenticatable
         }
 
         return asset('image/user_image.png');
+    }
+
+    public function requerimientosSolicitados(): HasMany
+    {
+        return $this->hasMany(Requerimiento::class, 'solicitante_id');
+    }
+
+    public function requerimientosGestionados(): HasMany
+    {
+        return $this->hasMany(Requerimiento::class, 'gestor_id');
     }
 
     public static function borrarFoto(?string $ruta): void

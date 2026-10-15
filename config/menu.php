@@ -22,6 +22,16 @@ return [
         'route' => 'home',
     ],
     [
+        'label' => 'Requerimientos',
+        'icon' => 'clipboard',
+        'children' => [
+            ['label' => 'Listado', 'icon' => 'list', 'route' => 'requerimientos.index', 'active' => ['requerimientos.index', 'requerimientos.create', 'requerimientos.show', 'requerimientos.edit', 'requerimientos.casos-uso.*'], 'can' => ['requerimientos.ver', 'requerimientos.revisar']],
+            ['label' => 'Bandeja de revisión', 'icon' => 'inbox', 'route' => 'requerimientos.bandeja', 'can' => 'requerimientos.revisar'],
+            ['label' => 'Kanban', 'icon' => 'trello', 'route' => 'requerimientos.kanban', 'can' => ['requerimientos.ver', 'requerimientos.revisar']],
+            ['label' => 'Calendario', 'icon' => 'calendar', 'route' => 'requerimientos.calendario', 'can' => ['requerimientos.ver', 'requerimientos.revisar']],
+        ],
+    ],
+    [
         'label' => 'Administración',
         'icon' => 'settings',
         'children' => [

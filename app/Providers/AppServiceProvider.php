@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\CasoUso;
+use App\Models\Requerimiento;
+use App\Models\RequerimientoAdjunto;
 use App\Models\User;
 use App\Observers\BitacoraObserver;
 use App\Services\MenuService;
@@ -45,5 +48,8 @@ class AppServiceProvider extends ServiceProvider
         User::observe(BitacoraObserver::class);
         Role::observe(BitacoraObserver::class);
         Permission::observe(BitacoraObserver::class);
+        Requerimiento::observe(BitacoraObserver::class);
+        CasoUso::observe(BitacoraObserver::class);
+        RequerimientoAdjunto::observe(BitacoraObserver::class);
     }
 }

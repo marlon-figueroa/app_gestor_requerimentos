@@ -2,6 +2,9 @@
 
 namespace App\Observers;
 
+use App\Models\CasoUso;
+use App\Models\Requerimiento;
+use App\Models\RequerimientoAdjunto;
 use App\Models\User;
 use App\Services\BitacoraService;
 use Illuminate\Database\Eloquent\Model;
@@ -17,6 +20,9 @@ class BitacoraObserver
         User::class => 'usuarios',
         Role::class => 'roles',
         Permission::class => 'permisos',
+        Requerimiento::class => 'requerimientos',
+        CasoUso::class => 'casos de uso',
+        RequerimientoAdjunto::class => 'adjuntos de requerimientos',
     ];
 
     /**

@@ -108,7 +108,11 @@ class BitacoraService
 
     private function etiquetaModelo(Model $modelo): string
     {
-        return (string) ($modelo->getAttribute('name') ?? $modelo->getAttribute('nombre') ?? class_basename($modelo));
+        return (string) ($modelo->getAttribute('name')
+            ?? $modelo->getAttribute('nombre')
+            ?? $modelo->getAttribute('titulo')
+            ?? $modelo->getAttribute('nombre_original')
+            ?? class_basename($modelo));
     }
 
 }

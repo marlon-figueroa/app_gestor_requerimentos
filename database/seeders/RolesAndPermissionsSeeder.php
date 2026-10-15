@@ -18,6 +18,7 @@ class RolesAndPermissionsSeeder extends Seeder
         'permisos' => ['ver', 'crear', 'editar', 'eliminar'],
         'bitacora' => ['ver', 'exportar', 'invalidar_sesion'],
         'monitoreo' => ['pulse', 'logs'],
+        'requerimientos' => ['ver', 'crear', 'editar', 'eliminar', 'exportar', 'revisar'],
     ];
 
     public function run(): void
@@ -29,7 +30,18 @@ class RolesAndPermissionsSeeder extends Seeder
             ->map(fn (string $nombre) => Permission::findOrCreate($nombre, 'web'));
 
         Role::findOrCreate('Administrador', 'web')->syncPermissions($permisos);
-        Role::findOrCreate('Usuario', 'web');
+        Role::findOrCreate('Gestor', 'web')->syncPermissions([
+            'requerimientos.ver',
+            'requerimientos.exportar',
+            'requerimientos.revisar',
+        ]);
+        Role::findOrCreate('Usuario', 'web')->syncPermissions([
+            'requerimientos.ver',
+            'requerimientos.crear',
+            'requerimientos.editar',
+            'requerimientos.eliminar',
+            'requerimientos.exportar',
+        ]);
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
