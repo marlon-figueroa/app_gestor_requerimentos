@@ -9,6 +9,7 @@ services:
     dockerContext: .
     plan: free
     healthCheckPath: /up
+    autoDeploy: true
     envVars:
       - key: APP_ENV
         value: production

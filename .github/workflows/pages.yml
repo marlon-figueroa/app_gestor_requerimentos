@@ -29,10 +29,12 @@ jobs:
       - name: Inyectar URL de la demo
         run: |
           url="${{ vars.DEMO_APP_URL }}"
-          if [ -z "$url" ]; then
-            url="https://gestor-requerimientos.onrender.com"
+          if [ -n "$url" ]; then
+            url="${url%/}"
+            sed -i "s|__DEMO_APP_URL__|${url}|g" docs/index.html
+            sed -i 's|id="demo-pending" class="alert"|id="demo-pending" class="alert hidden"|' docs/index.html
+            sed -i 's|id="demo-ready" class="hidden"|id="demo-ready" class=""|' docs/index.html
           fi
-          sed -i "s|__DEMO_APP_URL__|${url}|g" docs/index.html
 
       - uses: actions/configure-pages@v5
         with:

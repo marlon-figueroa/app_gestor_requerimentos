@@ -42,6 +42,11 @@ class RequerimientoPolicy
             && $requerimiento->estado === EstadoRequerimiento::Borrador;
     }
 
+    public function exportAny(User $user): bool
+    {
+        return $user->can('requerimientos.exportar');
+    }
+
     public function export(User $user, Requerimiento $requerimiento): bool
     {
         return $user->can('requerimientos.exportar') && $this->view($user, $requerimiento);

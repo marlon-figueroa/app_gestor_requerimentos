@@ -15,7 +15,8 @@
 ## 1. Render (aplicación Laravel)
 
 1. Crea cuenta en [Render](https://render.com).
-2. **New → Blueprint** y conecta este repositorio, o **New Web Service** con Docker:
+2. **New → Blueprint** y conecta este repositorio (usa [`render.yaml`](../render.yaml) en la raíz), o **New Web Service** con Docker:
+   - Si la URL `https://gestor-requerimientos.onrender.com` responde **404**, el servicio **aún no existe** en tu cuenta: hay que crearlo con Blueprint o Web Service; el deploy hook de GitHub **no crea** el servicio solo.
    - Dockerfile: `deploy/Dockerfile`
    - Context: raíz del repo
    - Plan: **Free**
@@ -36,7 +37,7 @@
 
 1. GitHub → **Settings → Pages** → Build and deployment → Source: **GitHub Actions** (obligatorio la primera vez; el workflow también intenta activarlo con `enablement: true`).
    - Si falla con *Get Pages site failed*, casi siempre falta este paso o el repo no tiene permisos de Pages en el plan de la org.
-2. Opcional: **Variables** → `DEMO_APP_URL` = URL de Render (si no, la landing usa un placeholder).
+2. **Variables** → `DEMO_APP_URL` = URL real de tu servicio Render (sin `/` final). Sin esta variable, la landing no muestra el botón «Abrir aplicación» y enlaza a [configurar-render.html](configurar-render.html).
 3. El workflow [`.github/workflows/pages.yml`](../.github/workflows/pages.yml) publica `docs/` en cada push a `main`.
 
 ---

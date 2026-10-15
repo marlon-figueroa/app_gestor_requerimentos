@@ -13,6 +13,8 @@
             --surface: #fff;
             --text: #1e293b;
             --muted: #64748b;
+            --warn-bg: rgba(234, 179, 8, 0.15);
+            --warn-border: rgba(234, 179, 8, 0.45);
         }
         @media (prefers-color-scheme: dark) {
             :root {
@@ -49,12 +51,18 @@
         .btn {
             display: inline-block;
             margin-top: 1.25rem;
+            margin-right: 0.5rem;
             padding: 0.75rem 1.5rem;
             background: var(--brand);
             color: #fff !important;
             text-decoration: none;
             border-radius: 0.5rem;
             font-weight: 600;
+        }
+        .btn-secondary {
+            background: transparent;
+            color: var(--brand) !important;
+            border: 2px solid var(--brand);
         }
         .btn:hover { filter: brightness(1.08); }
         .note {
@@ -65,8 +73,23 @@
             font-size: 0.9rem;
             color: var(--muted);
         }
+        .alert {
+            margin-top: 1.25rem;
+            padding: 1rem 1.1rem;
+            border-radius: 0.5rem;
+            background: var(--warn-bg);
+            border: 1px solid var(--warn-border);
+            font-size: 0.92rem;
+        }
+        .demo-url {
+            margin-top: 0.75rem;
+            font-size: 0.85rem;
+            word-break: break-all;
+            color: var(--muted);
+        }
         ul { padding-left: 1.25rem; }
         code { font-size: 0.85em; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -77,17 +100,27 @@
     <main class="wrap">
         <div class="card">
             <h2 style="margin-top:0">Demo en línea</h2>
-            <p>La aplicación Laravel se ejecuta en un host con PHP y base SQLite. GitHub Pages solo muestra esta página informativa.</p>
-            <a class="btn" href="__DEMO_APP_URL__">Abrir aplicación</a>
-            <div class="note">
-                <strong>Plan gratuito (Render):</strong> el servicio puede tardar en despertar tras inactividad y los datos de demo pueden reiniciarse al redeploy.
+            <p>Esta página está en <strong>GitHub Pages</strong>. La aplicación Laravel (login, proyectos, etc.) corre en <strong>Render</strong>, no aquí.</p>
+
+            <div id="demo-pending" class="alert">
+                <strong>La demo aún no está publicada.</strong> El botón «Abrir aplicación» solo funcionará después de crear el servicio en Render y configurar la variable <code>DEMO_APP_URL</code> en GitHub.
+                <a class="btn btn-secondary" href="configurar-render.html" style="margin-top:0.75rem">Cómo activar la demo</a>
             </div>
-            <h3>Acceso demo (tras seed)</h3>
+
+            <div id="demo-ready" class="hidden">
+                <a class="btn" id="demo-link" href="__DEMO_APP_URL__" rel="noopener">Abrir aplicación</a>
+                <p class="demo-url">URL: <a id="demo-url-text" href="__DEMO_APP_URL__">__DEMO_APP_URL__</a></p>
+                <div class="note">
+                    <strong>Plan gratuito (Render):</strong> la primera visita puede tardar ~1 minuto si el servicio estaba dormido.
+                </div>
+            </div>
+
+            <h3>Acceso demo (tras seed en Render)</h3>
             <ul>
                 <li>Administrador: <code>admin@example.com</code> / <code>password</code></li>
                 <li>Gestor: <code>ana.martinez@example.com</code> / <code>password</code></li>
             </ul>
-            <p><a href="deploy-github-sqlite.md">Guía de despliegue</a></p>
+            <p><a href="deploy-github-sqlite.md">Guía completa de despliegue</a></p>
         </div>
     </main>
 </body>
