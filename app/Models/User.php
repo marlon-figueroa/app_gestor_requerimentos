@@ -10,12 +10,13 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
+use Lab404\Impersonate\Models\Impersonate;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, HasRoles, Notifiable;
+    use HasFactory, HasRoles, Impersonate, Notifiable;
 
     /**
      * Carpeta del disco public donde se guardan las fotos.
@@ -85,6 +86,14 @@ class User extends Authenticatable
         }
 
         return asset('image/user_image.png');
+    }
+
+    /**
+     * Solo un Administrador que actúa con su propia sesión puede suplantar a otro usuario.
+     */
+    public function canImpersonate(): bool
+    {
+        return $this->hasRole('Administrador') && ! $this->isImpersonated();
     }
 
     public function requerimientosSolicitados(): HasMany

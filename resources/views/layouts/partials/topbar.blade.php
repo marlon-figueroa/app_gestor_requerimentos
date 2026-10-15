@@ -25,6 +25,15 @@
                         <div class="small text-body-secondary">{{ Auth::user()->getRoleNames()->implode(', ') ?: 'Sin rol' }}</div>
                     </div>
                     <div class="dropdown-divider"></div>
+                    @impersonating
+                        <form method="POST" action="{{ route('impersonate.leave') }}">
+                            @csrf
+                            <button type="submit" class="dropdown-item">
+                                <i class="bi bi-person-check me-2"></i> Volver a mi cuenta
+                            </button>
+                        </form>
+                        <div class="dropdown-divider"></div>
+                    @endImpersonating
                     <a class="dropdown-item" href="{{ route('logout') }}"
                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                         <i class="bi bi-box-arrow-right me-2"></i> {{ __('Logout') }}

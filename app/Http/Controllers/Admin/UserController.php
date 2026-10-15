@@ -50,6 +50,7 @@ class UserController extends Controller
                 'editPermission' => 'usuarios.editar',
                 'deletePermission' => 'usuarios.eliminar',
                 'confirm' => "¿Eliminar al usuario {$user->name}?",
+                'impersonateUser' => $user,
             ])->render())
             ->rawColumns(['name', 'roles', 'acciones'])
             ->toJson();

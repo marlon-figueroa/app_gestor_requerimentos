@@ -7,6 +7,8 @@ use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
+use Lab404\Impersonate\Events\LeaveImpersonation;
+use Lab404\Impersonate\Events\TakeImpersonation;
 
 class BitacoraAutenticacionListener
 {
@@ -46,6 +48,36 @@ class BitacoraAutenticacionListener
             'exitoso' => false,
             'error_mensaje' => $event->user ? 'Contraseña incorrecta' : 'Usuario no registrado',
             'datos_adicionales' => ['email' => $email],
+        ]);
+    }
+
+    public function handleTakeImpersonation(TakeImpersonation $event): void
+    {
+        $this->bitacora->registrar('impersonar', 'Suplantación de usuario', [
+            'usuario_id' => $event->impersonator->getAuthIdentifier(),
+            'modulo' => 'autenticacion',
+            'descripcion' => "{$event->impersonator->email} ingresó como {$event->impersonated->email}.",
+            'modelo_type' => $event->impersonated->getMorphClass(),
+            'modelo_id' => $event->impersonated->getAuthIdentifier(),
+            'datos_adicionales' => [
+                'impersonador_id' => $event->impersonator->getAuthIdentifier(),
+                'suplantado_id' => $event->impersonated->getAuthIdentifier(),
+            ],
+        ]);
+    }
+
+    public function handleLeaveImpersonation(LeaveImpersonation $event): void
+    {
+        $this->bitacora->registrar('fin_impersonacion', 'Fin de suplantación', [
+            'usuario_id' => $event->impersonator->getAuthIdentifier(),
+            'modulo' => 'autenticacion',
+            'descripcion' => "{$event->impersonator->email} volvió de la sesión de {$event->impersonated->email}.",
+            'modelo_type' => $event->impersonated->getMorphClass(),
+            'modelo_id' => $event->impersonated->getAuthIdentifier(),
+            'datos_adicionales' => [
+                'impersonador_id' => $event->impersonator->getAuthIdentifier(),
+                'suplantado_id' => $event->impersonated->getAuthIdentifier(),
+            ],
         ]);
     }
 

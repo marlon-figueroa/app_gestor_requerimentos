@@ -9,6 +9,8 @@
         'eliminar' => 'trash',
         'login' => 'box-arrow-in-right',
         'logout' => 'box-arrow-right',
+        'impersonar' => 'person-bounding-box',
+        'fin_impersonacion' => 'person-check',
         'login_fallido' => 'shield-x',
         'bloqueo' => 'lock',
         'personalizada' => 'gear',

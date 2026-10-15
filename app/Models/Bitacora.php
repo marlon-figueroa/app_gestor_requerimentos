@@ -15,6 +15,8 @@ class Bitacora extends Model
         'personalizada' => 'Personalizada',
         'login' => 'Ingreso',
         'logout' => 'Salida',
+        'impersonar' => 'Suplantación',
+        'fin_impersonacion' => 'Fin de suplantación',
         'login_fallido' => 'Login fallido',
         'bloqueo' => 'Bloqueo',
         'sesion_invalidada' => 'Sesión invalidada',

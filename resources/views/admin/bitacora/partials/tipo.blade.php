@@ -5,6 +5,8 @@
         'eliminar' => 'text-bg-danger',
         'login' => 'text-bg-info',
         'logout' => 'text-bg-secondary',
+        'impersonar' => 'text-bg-warning',
+        'fin_impersonacion' => 'text-bg-secondary',
         'login_fallido' => 'text-bg-warning',
         'bloqueo' => 'bg-danger-subtle text-danger-emphasis border border-danger-subtle',
         'sesion_invalidada' => 'text-bg-dark',

@@ -14,6 +14,7 @@ use App\Http\Controllers\Requerimientos\RequerimientoController;
 use App\Services\RequerimientoFlujoService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Lab404\Impersonate\Controllers\ImpersonateController;
 
 Route::redirect('/', '/home');
 
@@ -21,6 +22,13 @@ Auth::routes();
 
 Route::middleware('auth')->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
+
+    // POST para que el cambio de sesión exija el token CSRF.
+    Route::post('impersonate/take/{id}', [ImpersonateController::class, 'take'])
+        ->name('impersonate')
+        ->whereNumber('id');
+    Route::post('impersonate/leave', [ImpersonateController::class, 'leave'])
+        ->name('impersonate.leave');
 
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('usuarios/data', [UserController::class, 'data'])->name('usuarios.data');

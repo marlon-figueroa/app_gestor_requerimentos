@@ -22,6 +22,7 @@
 
             <main class="app-content">
                 <div class="container-lg">
+                    @include('partials.impersonacion')
                     @include('partials.alerts')
 
                     @yield('content')
