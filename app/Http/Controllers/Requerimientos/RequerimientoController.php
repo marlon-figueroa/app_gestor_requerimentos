@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Requerimientos\RequerimientoRequest;
 use App\Models\Requerimiento;
 use App\Models\RequerimientoAdjunto;
+use App\Services\RequerimientoDiagramaService;
 use App\Services\RequerimientoFlujoService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Eloquent\Builder;
@@ -83,7 +84,7 @@ class RequerimientoController extends Controller
         return redirect()->route('requerimientos.show', $requerimiento)->with('success', 'Requerimiento creado correctamente.');
     }
 
-    public function show(Requerimiento $requerimiento)
+    public function show(Requerimiento $requerimiento, RequerimientoDiagramaService $diagrama)
     {
         $this->authorize('view', $requerimiento);
 
@@ -93,7 +94,9 @@ class RequerimientoController extends Controller
             ->filter(fn (string $accion) => auth()->user()->can($accion, $requerimiento))
             ->values();
 
-        return view('requerimientos.show', compact('requerimiento', 'acciones'));
+        $pasos = $diagrama->pasos($requerimiento);
+
+        return view('requerimientos.show', compact('requerimiento', 'acciones', 'pasos'));
     }
 
     public function edit(Requerimiento $requerimiento)

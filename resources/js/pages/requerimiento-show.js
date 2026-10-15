@@ -1,9 +1,16 @@
 import { Dropzone, opcionesAdjuntos, iconoPdf } from '../libs/adjuntos';
+import { initDiagramaPasos } from '../libs/diagrama-requerimiento';
 import { initVisorAdjuntos } from '../libs/visor-adjuntos';
 import { initFormulariosFlujo } from '../libs/flujo';
 
 initVisorAdjuntos();
 initFormulariosFlujo();
+
+const datosDiagrama = document.getElementById('diagrama-pasos-datos');
+
+if (datosDiagrama) {
+    initDiagramaPasos(document.getElementById('diagrama-pasos'), JSON.parse(datosDiagrama.textContent));
+}
 
 const zone = document.getElementById('adjuntos-subida');
 

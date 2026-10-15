@@ -34,6 +34,8 @@
             ? $requerimiento->revisiones->firstWhere('accion', 'rechazar')
             : null;
     @endphp
+    @include('requerimientos.partials.diagrama')
+
     @if ($ultimoRechazo)
         <div class="alert alert-danger d-flex gap-2" role="alert">
             <i class="bi bi-exclamation-octagon fs-5"></i>

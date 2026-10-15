@@ -224,6 +224,33 @@ body {
     }
 }
 
+.diagrama-pasos {
+    width: 100%;
+    min-height: 12rem;
+    overflow: auto;
+
+    svg {
+        display: block;
+    }
+}
+
+.diagrama-leyenda {
+    display: inline-block;
+    width: 0.65rem;
+    height: 0.65rem;
+    margin-right: 0.25rem;
+    border-radius: 50%;
+    vertical-align: baseline;
+
+    &--solicitante {
+        background-color: #0d6efd;
+    }
+
+    &--gestor {
+        background-color: #6f42c1;
+    }
+}
+
 // Pulse y Log Viewer incrustados en las pestañas de la bitácora
 .panel-embebido {
     display: block;
