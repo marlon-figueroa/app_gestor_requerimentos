@@ -1,7 +1,7 @@
 ## Gestor de Requerimientos
 
 - **Desarrollo local:** Podman — ver [docs/podman.md](docs/podman.md).
-- **Publicación:** GitHub Pages (landing) + Render (app Laravel + SQLite) — ver [docs/deploy-github-sqlite.md](docs/deploy-github-sqlite.md).
+- **CI:** GitHub Actions ejecuta tests en cada push/PR (`.github/workflows/ci.yml`).
 
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 

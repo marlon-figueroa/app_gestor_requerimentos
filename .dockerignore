@@ -20,4 +20,3 @@ phpunit.xml
 compose.yaml
 podman/env/*.env
 *.md
-!deploy/**/*.md

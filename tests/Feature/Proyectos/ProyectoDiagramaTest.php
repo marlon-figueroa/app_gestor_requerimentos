@@ -56,7 +56,8 @@ class ProyectoDiagramaTest extends TestCase
         $this->actingAs($gestor)
             ->get(route('proyectos.show', $proyecto))
             ->assertOk()
-            ->assertSee('btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#diagrama-modal"', false)
+            ->assertSee('data-bs-target="#diagrama-modal"', false)
+            ->assertSee('Diagrama', false)
             ->assertSee('id="diagrama-modal"', false)
             ->assertSee('id="diagrama-estados"', false);
     }

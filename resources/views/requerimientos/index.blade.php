@@ -12,7 +12,7 @@
         <x-page-action-group label="Vistas">
             <x-action-btn variant="nav" icon="kanban" label="Kanban" :href="route('requerimientos.kanban')" />
             <x-action-btn variant="nav" icon="calendar3" label="Calendario" :href="route('requerimientos.calendario')" />
-            @can('export', \App\Models\Requerimiento::class)
+            @can('exportAny', \App\Models\Requerimiento::class)
                 <x-action-btn variant="export" icon="filetype-csv" label="Exportar CSV" :href="route('requerimientos.export.csv')" id="export-csv-link" />
             @endcan
         </x-page-action-group>

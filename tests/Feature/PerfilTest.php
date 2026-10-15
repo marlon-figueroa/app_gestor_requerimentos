@@ -20,7 +20,7 @@ class PerfilTest extends TestCase
 
     public function test_usuario_autenticado_ve_su_perfil(): void
     {
-        $usuario = User::factory()->create()->assignRole('Solicitante');
+        $usuario = User::factory()->create()->assignRole('Usuario');
 
         $this->actingAs($usuario)
             ->get(route('perfil.show'))
@@ -32,7 +32,7 @@ class PerfilTest extends TestCase
 
     public function test_usuario_actualiza_nombre_y_correo(): void
     {
-        $usuario = User::factory()->create()->assignRole('Solicitante');
+        $usuario = User::factory()->create()->assignRole('Usuario');
 
         $this->actingAs($usuario)
             ->put(route('perfil.update'), [
@@ -50,7 +50,7 @@ class PerfilTest extends TestCase
     {
         $usuario = User::factory()->create([
             'password' => 'anterior-12',
-        ])->assignRole('Solicitante');
+        ])->assignRole('Usuario');
 
         $this->actingAs($usuario)
             ->put(route('perfil.password'), [

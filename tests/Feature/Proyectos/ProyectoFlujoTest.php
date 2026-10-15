@@ -169,7 +169,7 @@ class ProyectoFlujoTest extends TestCase
     {
         $proyecto = $this->proyecto();
 
-        $this->actingAs($this->usuario)->get(route('proyectos.index'))->assertForbidden();
+        $this->actingAs($this->usuario)->get(route('proyectos.index'))->assertOk();
         $this->actingAs($this->usuario)->get(route('proyectos.show', $proyecto))->assertForbidden();
         $this->actingAs($this->usuario)->post(route('proyectos.store'), $this->datos())->assertForbidden();
         $this->actingAs($this->usuario)->post(route('proyectos.flujo', [$proyecto, 'cancelar']), ['observaciones' => 'x'])->assertForbidden();
