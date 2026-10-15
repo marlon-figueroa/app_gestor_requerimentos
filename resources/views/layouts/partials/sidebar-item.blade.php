@@ -12,7 +12,7 @@
             <i data-feather="chevron-right" class="app-sidebar-chevron ms-auto"></i>
         </button>
 
-        <div @class(['collapse', 'show' => $item['abierto']]) id="{{ $item['id'] }}">
+        <div @class(['collapse', 'show' => $item['abierto']]) id="{{ $item['id'] }}" data-flyout-title="{{ $item['label'] }}">
             <ul class="nav flex-column app-sidebar-submenu">
                 @each('layouts.partials.sidebar-item', $item['children'], 'item')
             </ul>

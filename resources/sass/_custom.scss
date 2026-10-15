@@ -82,6 +82,11 @@ body {
 
 .sidebar-collapsed {
     @include media-breakpoint-up(lg) {
+        .app-sidebar,
+        .app-sidebar-panel {
+            overflow: visible;
+        }
+
         .app-sidebar-brand {
             justify-content: center;
             padding-inline: 0.5rem;
@@ -97,21 +102,101 @@ body {
 
         .app-sidebar-nav {
             padding-inline: 0.5rem;
+            max-height: calc(100vh - #{$topbar-height});
+            overflow-x: visible;
+            overflow-y: auto;
 
-            .nav-link,
-            .app-sidebar-branch {
-                justify-content: center;
-                gap: 0;
-                padding-inline: 0.5rem;
-            }
+            > .nav > .app-sidebar-item {
+                position: relative;
 
-            .text-truncate,
-            .app-sidebar-chevron {
-                display: none;
-            }
+                > .nav-link,
+                > .app-sidebar-branch {
+                    justify-content: center;
+                    gap: 0;
+                    padding-inline: 0.5rem;
+                }
 
-            .collapse {
-                display: none !important;
+                > .nav-link .text-truncate,
+                > .app-sidebar-branch .text-truncate,
+                > .app-sidebar-branch .app-sidebar-chevron {
+                    display: none;
+                }
+
+                > .collapse {
+                    display: none !important;
+                    position: absolute;
+                    left: calc(100% + 0.35rem);
+                    top: 0;
+                    z-index: $zindex-dropdown + 5;
+                    min-width: 14rem;
+                    max-width: 18rem;
+                    padding: 0.35rem 0 0.5rem;
+                    border-radius: $border-radius-lg;
+                    background-color: var(--app-sidebar-bg);
+                    border: 1px solid var(--app-sidebar-border);
+                    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+                    &::before {
+                        content: attr(data-flyout-title);
+                        display: block;
+                        padding: 0.35rem 0.75rem 0.5rem;
+                        font-size: 0.8rem;
+                        font-weight: 700;
+                        letter-spacing: 0.02em;
+                        text-transform: uppercase;
+                        color: var(--app-sidebar-text-muted);
+                        border-bottom: 1px solid var(--app-sidebar-border);
+                        margin-bottom: 0.25rem;
+                    }
+
+                    .text-truncate {
+                        display: block;
+                        min-width: 0;
+                    }
+
+                    .app-sidebar-chevron {
+                        display: block;
+                    }
+
+                    .nav-link,
+                    .app-sidebar-branch {
+                        justify-content: flex-start;
+                        gap: 0.75rem;
+                        padding-inline: 0.75rem;
+                    }
+
+                    .app-sidebar-submenu {
+                        margin-left: calc(0.75rem + 0.575rem);
+                        padding-left: 0.5rem;
+                        border-left: 1px solid var(--app-sidebar-submenu-border);
+                    }
+
+                    .app-sidebar-submenu .collapse {
+                        position: static;
+                        left: auto;
+                        top: auto;
+                        z-index: auto;
+                        min-width: 0;
+                        max-width: none;
+                        padding: 0;
+                        margin: 0;
+                        border: 0;
+                        box-shadow: none;
+                        background: transparent;
+
+                        &::before {
+                            display: none;
+                        }
+                    }
+                }
+
+                &:hover > .collapse,
+                &:focus-within > .collapse,
+                &.app-sidebar-flyout-open > .collapse {
+                    display: block !important;
+                    height: auto !important;
+                    visibility: visible;
+                }
             }
         }
     }

@@ -13,6 +13,16 @@ function storeCollapsed(collapsed) {
     }
 }
 
+function isCollapsedDesktop() {
+    return desktop.matches && document.documentElement.classList.contains('sidebar-collapsed');
+}
+
+function closeFlyouts() {
+    document.querySelectorAll('.app-sidebar-flyout-open').forEach((item) => {
+        item.classList.remove('app-sidebar-flyout-open');
+    });
+}
+
 function updateToggles() {
     const expanded = desktop.matches
         ? !document.documentElement.classList.contains('sidebar-collapsed')
@@ -35,6 +45,9 @@ export function initSidebar() {
             if (desktop.matches) {
                 const collapsed = document.documentElement.classList.toggle('sidebar-collapsed');
                 storeCollapsed(collapsed);
+                if (! collapsed) {
+                    closeFlyouts();
+                }
             } else {
                 window.bootstrap.Offcanvas.getOrCreateInstance(sidebar).toggle();
             }
@@ -46,11 +59,48 @@ export function initSidebar() {
     sidebar.addEventListener('shown.bs.offcanvas', updateToggles);
     sidebar.addEventListener('hidden.bs.offcanvas', updateToggles);
 
+    sidebar.querySelector('.app-sidebar-nav')?.addEventListener('click', (event) => {
+        if (! isCollapsedDesktop()) {
+            return;
+        }
+
+        const branch = event.target.closest('.app-sidebar-nav > .nav > .app-sidebar-item > .app-sidebar-branch');
+
+        if (! branch) {
+            return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        const item = branch.closest('.app-sidebar-item');
+        const pin = ! item.classList.contains('app-sidebar-flyout-open');
+
+        closeFlyouts();
+
+        if (pin) {
+            item.classList.add('app-sidebar-flyout-open');
+        }
+    });
+
+    document.addEventListener('click', (event) => {
+        if (! isCollapsedDesktop()) {
+            return;
+        }
+
+        if (event.target.closest('.app-sidebar-nav > .nav > .app-sidebar-item')) {
+            return;
+        }
+
+        closeFlyouts();
+    });
+
     desktop.addEventListener('change', () => {
         if (desktop.matches) {
             window.bootstrap.Offcanvas.getInstance(sidebar)?.hide();
         }
 
+        closeFlyouts();
         updateToggles();
     });
 
