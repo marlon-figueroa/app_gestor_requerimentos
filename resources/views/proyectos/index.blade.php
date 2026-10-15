@@ -6,9 +6,9 @@
     <x-page-header title="Proyectos" icon="briefcase" section="Proyectos"
                    subtitle="Proyectos activos y cerrados, con su responsable y los requerimientos que ejecutan.">
         @can('create', \App\Models\Proyecto::class)
-            <a href="{{ route('proyectos.create') }}" class="btn btn-primary">
-                <i class="bi bi-plus-lg"></i> Nuevo proyecto
-            </a>
+            <x-page-action-group label="Alta">
+                <x-action-btn variant="create" icon="plus-lg" label="Nuevo proyecto" :href="route('proyectos.create')" />
+            </x-page-action-group>
         @endcan
     </x-page-header>
 

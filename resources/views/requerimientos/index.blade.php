@@ -9,21 +9,17 @@
 @section('content')
     <x-page-header :title="$titulo" :icon="$bandeja ? 'inbox' : 'clipboard-check'" section="Requerimientos"
                    :subtitle="$bandeja ? 'Requerimientos enviados a revisión que aún no tienen gestor.' : 'Solicitudes, revisión y seguimiento de requerimientos.'">
-        <a href="{{ route('requerimientos.kanban') }}" class="btn btn-outline-secondary">
-            <i class="bi bi-kanban"></i> Kanban
-        </a>
-        <a href="{{ route('requerimientos.calendario') }}" class="btn btn-outline-secondary">
-            <i class="bi bi-calendar3"></i> Calendario
-        </a>
-        @can('export', \App\Models\Requerimiento::class)
-            <a href="{{ route('requerimientos.export.csv') }}" class="btn btn-outline-success" id="export-csv-link">
-                <i class="bi bi-filetype-csv"></i> Exportar CSV
-            </a>
-        @endcan
+        <x-page-action-group label="Vistas">
+            <x-action-btn variant="nav" icon="kanban" label="Kanban" :href="route('requerimientos.kanban')" />
+            <x-action-btn variant="nav" icon="calendar3" label="Calendario" :href="route('requerimientos.calendario')" />
+            @can('export', \App\Models\Requerimiento::class)
+                <x-action-btn variant="export" icon="filetype-csv" label="Exportar CSV" :href="route('requerimientos.export.csv')" id="export-csv-link" />
+            @endcan
+        </x-page-action-group>
         @can('create', \App\Models\Requerimiento::class)
-            <a href="{{ route('requerimientos.create') }}" class="btn btn-primary">
-                <i class="bi bi-plus-lg"></i> Nuevo requerimiento
-            </a>
+            <x-page-action-group label="Alta">
+                <x-action-btn variant="create" icon="plus-lg" label="Nuevo requerimiento" :href="route('requerimientos.create')" />
+            </x-page-action-group>
         @endcan
     </x-page-header>
 

@@ -7,24 +7,29 @@
     'exportLabel' => 'Exportar PDF',
     'exportPermission' => null,
     'table' => null,
+    'groupLabel' => null,
 ])
 
 @php
     $puede = fn (?string $permiso) => $permiso === null || (bool) auth()->user()?->can($permiso);
+    $tieneExport = $export && $puede($exportPermission);
+    $tieneCreate = $create && $puede($createPermission);
 @endphp
 
-<div {{ $attributes->class(['action-bar d-flex flex-wrap align-items-center gap-2']) }}>
-    {{ $slot }}
+@if ($tieneExport || $tieneCreate || ! $slot->isEmpty())
+    <x-page-action-group :label="$groupLabel">
+        {{ $slot }}
 
-    @if ($export && $puede($exportPermission))
-        <a href="{{ $export }}" class="btn btn-outline-danger" @if ($table) data-export-table="{{ $table }}" @endif>
-            <i class="bi bi-file-earmark-pdf"></i> {{ $exportLabel }}
-        </a>
-    @endif
+        @if ($tieneExport)
+            @if ($table)
+                <x-action-btn variant="export" icon="file-earmark-pdf" :label="$exportLabel" :href="$export" data-export-table="{{ $table }}" />
+            @else
+                <x-action-btn variant="export" icon="file-earmark-pdf" :label="$exportLabel" :href="$export" />
+            @endif
+        @endif
 
-    @if ($create && $puede($createPermission))
-        <a href="{{ $create }}" class="btn btn-primary">
-            <i class="bi bi-{{ $createIcon }}"></i> {{ $createLabel }}
-        </a>
-    @endif
-</div>
+        @if ($tieneCreate)
+            <x-action-btn variant="create" :icon="$createIcon" :label="$createLabel" :href="$create" />
+        @endif
+    </x-page-action-group>
+@endif

@@ -6,9 +6,9 @@
     <x-page-header title="Mis proyectos" icon="briefcase" section="Proyectos"
                    subtitle="Proyectos en los que participa con sus requerimientos.">
         @can('create', \App\Models\Requerimiento::class)
-            <a href="{{ route('requerimientos.create') }}" class="btn btn-primary">
-                <i class="bi bi-plus-lg"></i> Nuevo requerimiento
-            </a>
+            <x-page-action-group label="Alta">
+                <x-action-btn variant="create" icon="plus-lg" label="Nuevo requerimiento" :href="route('requerimientos.create')" />
+            </x-page-action-group>
         @endcan
     </x-page-header>
 

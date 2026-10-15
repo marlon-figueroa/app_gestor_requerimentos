@@ -5,9 +5,9 @@
 @section('content')
     <x-page-header title="Roles" icon="person-badge" subtitle="Perfiles de permisos asignables a usuarios.">
         @can('roles.crear')
-            <a href="{{ route('admin.roles.create') }}" class="btn btn-primary">
-                <i class="bi bi-plus-lg"></i> Nuevo rol
-            </a>
+            <x-page-action-group label="Alta">
+                <x-action-btn variant="create" icon="plus-lg" label="Nuevo rol" :href="route('admin.roles.create')" />
+            </x-page-action-group>
         @endcan
     </x-page-header>
 

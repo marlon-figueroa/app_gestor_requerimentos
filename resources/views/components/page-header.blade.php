@@ -44,8 +44,10 @@
         </div>
 
         @if ($slot->isNotEmpty())
-            <div class="view-header__actions d-flex flex-wrap align-items-center gap-2 ms-auto">
-                {{ $slot }}
+            <div class="view-header__actions ms-auto">
+                <x-page-actions>
+                    {{ $slot }}
+                </x-page-actions>
             </div>
         @endif
     </div>

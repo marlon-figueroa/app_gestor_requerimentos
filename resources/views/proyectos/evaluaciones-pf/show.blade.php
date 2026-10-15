@@ -10,40 +10,38 @@
 @section('content')
     <x-page-header :title="$evaluacion->nombre" icon="calculator" section="Proyectos"
                    :parent="['url' => route('proyectos.evaluaciones-pf.index', $proyecto), 'label' => 'Puntos de función']">
-        @can('export', $evaluacion)
-            <a href="{{ route('proyectos.evaluaciones-pf.pdf', [$proyecto, $evaluacion]) }}" class="btn btn-outline-danger" target="_blank">
-                <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
-            </a>
-        @endcan
+        <x-page-action-group label="Navegación">
+            <x-action-btn variant="nav" icon="arrow-left" label="Listado" :href="route('proyectos.evaluaciones-pf.index', $proyecto)" />
+            @can('export', $evaluacion)
+                <x-action-btn variant="export" icon="file-earmark-pdf" label="Exportar PDF" :href="route('proyectos.evaluaciones-pf.pdf', [$proyecto, $evaluacion])" target="_blank" />
+            @endcan
+        </x-page-action-group>
         @can('update', $evaluacion)
-            <a href="{{ route('proyectos.evaluaciones-pf.edit', [$proyecto, $evaluacion]) }}" class="btn btn-outline-primary">
-                <i class="bi bi-pencil-square"></i> Editar
-            </a>
-            <form method="POST" action="{{ route('proyectos.evaluaciones-pf.baseline', [$proyecto, $evaluacion]) }}" class="d-inline">
-                @csrf
-                <button type="submit" class="btn btn-outline-success">
-                    <i class="bi bi-bookmark-check"></i> Marcar baseline
-                </button>
-            </form>
+            <x-page-action-group label="Edición">
+                <x-action-btn variant="edit" icon="pencil-square" label="Editar" :href="route('proyectos.evaluaciones-pf.edit', [$proyecto, $evaluacion])" />
+                <form method="POST" action="{{ route('proyectos.evaluaciones-pf.baseline', [$proyecto, $evaluacion]) }}" class="page-action-form">
+                    @csrf
+                    <x-action-btn type="submit" variant="success-outline" icon="bookmark-check" label="Marcar baseline" />
+                </form>
+            </x-page-action-group>
         @endcan
         @can('create', [\App\Models\ProyectoEvaluacionPf::class, $proyecto])
-            <form method="POST" action="{{ route('proyectos.evaluaciones-pf.duplicate', [$proyecto, $evaluacion]) }}" class="d-inline">
-                @csrf
-                <button type="submit" class="btn btn-outline-secondary">
-                    <i class="bi bi-copy"></i> Duplicar
-                </button>
-            </form>
+            <x-page-action-group label="Copia">
+                <form method="POST" action="{{ route('proyectos.evaluaciones-pf.duplicate', [$proyecto, $evaluacion]) }}" class="page-action-form">
+                    @csrf
+                    <x-action-btn type="submit" variant="tool" icon="copy" label="Duplicar" />
+                </form>
+            </x-page-action-group>
         @endcan
         @if ($evaluacion->es_baseline)
             <span class="badge text-bg-success align-self-center">Baseline</span>
         @endif
         @can('delete', $evaluacion)
-            <x-delete-button :url="route('proyectos.evaluaciones-pf.destroy', [$proyecto, $evaluacion])" label="Eliminar"
-                             confirm="¿Eliminar esta evaluación por puntos de función?" class="btn btn-outline-danger" />
+            <x-page-action-group label="Registro">
+                <x-delete-button :url="route('proyectos.evaluaciones-pf.destroy', [$proyecto, $evaluacion])" label="Eliminar"
+                                 confirm="¿Eliminar esta evaluación por puntos de función?" />
+            </x-page-action-group>
         @endcan
-        <a href="{{ route('proyectos.evaluaciones-pf.index', $proyecto) }}" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left"></i> Listado
-        </a>
     </x-page-header>
 
     @include('proyectos.evaluaciones-pf.partials.diagnostico')

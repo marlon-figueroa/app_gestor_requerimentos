@@ -4,16 +4,16 @@
 
 @section('content')
     <x-page-header title="Usuarios" icon="people" subtitle="Administración de cuentas y accesos.">
-        @can('usuarios.exportar')
-            <a href="{{ route('admin.usuarios.pdf') }}" id="btn-exportar-pdf" class="btn btn-outline-danger">
-                <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
-            </a>
-        @endcan
-        @can('usuarios.crear')
-            <a href="{{ route('admin.usuarios.create') }}" class="btn btn-primary">
-                <i class="bi bi-plus-lg"></i> Nuevo usuario
-            </a>
-        @endcan
+        @canany(['usuarios.exportar', 'usuarios.crear'])
+            <x-page-action-group label="Administración">
+                @can('usuarios.exportar')
+                    <x-action-btn variant="export" icon="file-earmark-pdf" label="Exportar PDF" :href="route('admin.usuarios.pdf')" id="btn-exportar-pdf" />
+                @endcan
+                @can('usuarios.crear')
+                    <x-action-btn variant="create" icon="plus-lg" label="Nuevo usuario" :href="route('admin.usuarios.create')" />
+                @endcan
+            </x-page-action-group>
+        @endcanany
     </x-page-header>
 
     <div class="card mb-4">

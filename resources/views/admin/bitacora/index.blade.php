@@ -18,9 +18,9 @@
         subtitle="Registros de actividad, sesiones activas y herramientas de monitoreo."
     >
         @can('bitacora.exportar')
-            <a href="{{ route('admin.bitacora.pdf') }}" id="btn-exportar-pdf" class="btn btn-outline-danger @if ($activa !== 'registros') d-none @endif">
-                <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
-            </a>
+            <x-page-action-group label="Exportar">
+                <x-action-btn variant="export" icon="file-earmark-pdf" label="Exportar PDF" :href="route('admin.bitacora.pdf')" id="btn-exportar-pdf" @class(['d-none' => $activa !== 'registros'])" />
+            </x-page-action-group>
         @endcan
     </x-page-header>
 

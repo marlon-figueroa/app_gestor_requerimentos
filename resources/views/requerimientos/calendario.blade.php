@@ -6,9 +6,10 @@
     <x-page-header title="Calendario" icon="calendar3" section="Requerimientos"
                    subtitle="Fechas de vencimiento de los requerimientos."
                    :parent="['url' => route('requerimientos.index'), 'label' => 'Requerimientos']">
-        <a href="{{ route('requerimientos.kanban') }}" class="btn btn-outline-secondary">
-            <i class="bi bi-kanban"></i> Kanban
-        </a>
+        <x-page-action-group label="Vistas">
+            <x-action-btn variant="nav" icon="list-ul" label="Listado" :href="route('requerimientos.index')" />
+            <x-action-btn variant="nav" icon="kanban" label="Kanban" :href="route('requerimientos.kanban')" />
+        </x-page-action-group>
     </x-page-header>
 
     <div class="card">

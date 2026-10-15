@@ -9,9 +9,9 @@
         :subtitle="$bitacora->accion"
         :parent="['url' => route('admin.bitacora.index').'#registros', 'label' => 'Bitácora']"
     >
-        <a href="{{ route('admin.bitacora.index') }}#registros" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left me-1"></i> Volver a registros
-        </a>
+        <x-page-action-group label="Navegación">
+            <x-action-btn variant="nav" icon="arrow-left" label="Volver a registros" :href="route('admin.bitacora.index').'#registros'" />
+        </x-page-action-group>
     </x-page-header>
 
     <div class="card">

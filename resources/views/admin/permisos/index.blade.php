@@ -5,9 +5,9 @@
 @section('content')
     <x-page-header title="Permisos" icon="key" subtitle="Capacidades individuales del sistema.">
         @can('permisos.crear')
-            <a href="{{ route('admin.permisos.create') }}" class="btn btn-primary">
-                <i class="bi bi-plus-lg"></i> Nuevo permiso
-            </a>
+            <x-page-action-group label="Alta">
+                <x-action-btn variant="create" icon="plus-lg" label="Nuevo permiso" :href="route('admin.permisos.create')" />
+            </x-page-action-group>
         @endcan
     </x-page-header>
 

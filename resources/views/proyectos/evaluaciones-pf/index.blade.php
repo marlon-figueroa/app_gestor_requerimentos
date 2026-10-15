@@ -6,14 +6,14 @@
     <x-page-header :title="'Puntos de función · '.$proyecto->codigo" icon="calculator" section="Proyectos"
                    subtitle="Evaluaciones IFPUG del proyecto."
                    :parent="['url' => route('proyectos.show', $proyecto), 'label' => $proyecto->codigo]">
+        <x-page-action-group label="Navegación">
+            <x-action-btn variant="nav" icon="arrow-left" label="Volver al proyecto" :href="route('proyectos.show', $proyecto)" />
+        </x-page-action-group>
         @can('create', [\App\Models\ProyectoEvaluacionPf::class, $proyecto])
-            <a href="{{ route('proyectos.evaluaciones-pf.create', $proyecto) }}" class="btn btn-primary">
-                <i class="bi bi-plus-lg"></i> Nueva evaluación
-            </a>
+            <x-page-action-group label="Alta">
+                <x-action-btn variant="create" icon="plus-lg" label="Nueva evaluación" :href="route('proyectos.evaluaciones-pf.create', $proyecto)" />
+            </x-page-action-group>
         @endcan
-        <a href="{{ route('proyectos.show', $proyecto) }}" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left"></i> Volver al proyecto
-        </a>
     </x-page-header>
 
     <div class="card">

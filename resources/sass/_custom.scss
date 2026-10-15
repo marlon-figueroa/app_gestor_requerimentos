@@ -535,6 +535,37 @@ table.dataTable td.acciones {
     }
 }
 
+.page-actions {
+    .page-action-group {
+        display: inline-flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.35rem;
+        max-width: 100%;
+        padding: 0.35rem;
+        border: 1px solid var(--bs-border-color-translucent);
+        border-radius: calc(var(--bs-border-radius) + 0.125rem);
+        background-color: var(--bs-tertiary-bg);
+    }
+
+    .page-action-form {
+        display: inline-flex;
+        margin: 0;
+    }
+
+    .btn-action {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        white-space: nowrap;
+
+        .bi {
+            line-height: 1;
+            font-size: 1.05em;
+        }
+    }
+}
+
 .view-header {
     &__icon {
         flex-shrink: 0;

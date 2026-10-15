@@ -13,23 +13,19 @@
 @section('content')
     <x-page-header :title="$proyecto->codigo.' · '.$proyecto->nombre" icon="briefcase" section="Proyectos"
                    :parent="['url' => route('proyectos.index'), 'label' => 'Proyectos']">
-        @can('export', $proyecto)
-            <a href="{{ route('proyectos.pdf', $proyecto) }}" class="btn btn-outline-danger" target="_blank">
-                <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
-            </a>
-        @endcan
-        <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#diagrama-modal">
-            <i class="bi bi-diagram-2"></i> Diagrama de estados
-        </button>
-        @can('viewAny', \App\Models\ProyectoEvaluacionPf::class)
-            <a href="{{ route('proyectos.evaluaciones-pf.index', $proyecto) }}" class="btn btn-outline-secondary">
-                <i class="bi bi-calculator"></i> Puntos de función
-            </a>
-        @endcan
+        <x-page-action-group label="Consultas">
+            <x-action-btn variant="nav" icon="diagram-2" label="Diagrama" data-bs-toggle="modal" data-bs-target="#diagrama-modal" />
+            @can('viewAny', \App\Models\ProyectoEvaluacionPf::class)
+                <x-action-btn variant="tool" icon="calculator" label="Puntos de función" :href="route('proyectos.evaluaciones-pf.index', $proyecto)" />
+            @endcan
+            @can('export', $proyecto)
+                <x-action-btn variant="export" icon="file-earmark-pdf" label="Exportar PDF" :href="route('proyectos.pdf', $proyecto)" target="_blank" />
+            @endcan
+        </x-page-action-group>
         @can('update', $proyecto)
-            <a href="{{ route('proyectos.edit', $proyecto) }}" class="btn btn-outline-primary">
-                <i class="bi bi-pencil-square"></i> Editar
-            </a>
+            <x-page-action-group label="Edición">
+                <x-action-btn variant="edit" icon="pencil-square" label="Editar" :href="route('proyectos.edit', $proyecto)" />
+            </x-page-action-group>
         @endcan
         @include('proyectos.partials.botones-flujo')
     </x-page-header>

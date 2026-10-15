@@ -11,24 +11,24 @@
 @section('content')
     <x-page-header :title="$requerimiento->codigo.' · '.$requerimiento->titulo" icon="clipboard-check" section="Requerimientos"
                    :parent="['url' => route('requerimientos.index'), 'label' => 'Requerimientos']">
-        @can('export', $requerimiento)
-            <a href="{{ route('requerimientos.pdf', $requerimiento) }}" class="btn btn-outline-danger" target="_blank">
-                <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
-            </a>
-        @endcan
-        <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#diagrama-modal">
-            <i class="bi bi-diagram-2"></i> Diagrama de estados
-        </button>
-        @can('update', $requerimiento)
-            <a href="{{ route('requerimientos.edit', $requerimiento) }}" class="btn btn-outline-primary">
-                <i class="bi bi-pencil-square"></i> Editar
-            </a>
-        @endcan
-        @can('delete', $requerimiento)
-            <x-delete-button :url="route('requerimientos.destroy', $requerimiento)" label="Eliminar"
-                             :confirm="'¿Eliminar el requerimiento '.$requerimiento->codigo.'?'"
-                             :redirect="route('requerimientos.index')" />
-        @endcan
+        <x-page-action-group label="Consultas">
+            <x-action-btn variant="nav" icon="diagram-2" label="Diagrama" data-bs-toggle="modal" data-bs-target="#diagrama-modal" />
+            @can('export', $requerimiento)
+                <x-action-btn variant="export" icon="file-earmark-pdf" label="Exportar PDF" :href="route('requerimientos.pdf', $requerimiento)" target="_blank" />
+            @endcan
+        </x-page-action-group>
+        @canany(['update', 'delete'], $requerimiento)
+            <x-page-action-group label="Registro">
+                @can('update', $requerimiento)
+                    <x-action-btn variant="edit" icon="pencil-square" label="Editar" :href="route('requerimientos.edit', $requerimiento)" />
+                @endcan
+                @can('delete', $requerimiento)
+                    <x-delete-button :url="route('requerimientos.destroy', $requerimiento)" label="Eliminar"
+                                     :confirm="'¿Eliminar el requerimiento '.$requerimiento->codigo.'?'"
+                                     :redirect="route('requerimientos.index')" />
+                @endcan
+            </x-page-action-group>
+        @endcanany
         @include('requerimientos.partials.botones-flujo', [
             'gestores' => \App\Http\Requests\Proyectos\ProyectoRequest::responsables()->pluck('name', 'id'),
         ])

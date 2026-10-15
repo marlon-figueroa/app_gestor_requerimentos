@@ -6,13 +6,14 @@
     <x-page-header title="Kanban" icon="kanban" section="Requerimientos"
                    subtitle="Arrastre una tarjeta a otra columna para cambiar su estado."
                    :parent="['url' => route('requerimientos.index'), 'label' => 'Requerimientos']">
-        <a href="{{ route('requerimientos.calendario') }}" class="btn btn-outline-secondary">
-            <i class="bi bi-calendar3"></i> Calendario
-        </a>
+        <x-page-action-group label="Vistas">
+            <x-action-btn variant="nav" icon="list-ul" label="Listado" :href="route('requerimientos.index')" />
+            <x-action-btn variant="nav" icon="calendar3" label="Calendario" :href="route('requerimientos.calendario')" />
+        </x-page-action-group>
         @can('create', \App\Models\Requerimiento::class)
-            <a href="{{ route('requerimientos.create') }}" class="btn btn-primary">
-                <i class="bi bi-plus-lg"></i> Nuevo requerimiento
-            </a>
+            <x-page-action-group label="Alta">
+                <x-action-btn variant="create" icon="plus-lg" label="Nuevo requerimiento" :href="route('requerimientos.create')" />
+            </x-page-action-group>
         @endcan
     </x-page-header>
 

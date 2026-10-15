@@ -9,9 +9,9 @@
         :subtitle="$sesion->user ? $sesion->user->name : 'Sesión sin usuario'"
         :parent="['url' => route('admin.bitacora.index').'#sesiones', 'label' => 'Bitácora']"
     >
-        <a href="{{ route('admin.bitacora.index') }}#sesiones" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left me-1"></i> Volver a sesiones activas
-        </a>
+        <x-page-action-group label="Navegación">
+            <x-action-btn variant="nav" icon="arrow-left" label="Volver a sesiones activas" :href="route('admin.bitacora.index').'#sesiones'" />
+        </x-page-action-group>
     </x-page-header>
 
     <div class="card">
