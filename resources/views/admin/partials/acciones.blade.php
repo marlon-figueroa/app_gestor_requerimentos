@@ -1,16 +1,29 @@
+@php
+    $suplantarId = null;
+
+    if (
+        isset($impersonateUser)
+        && auth()->user()?->canImpersonate()
+        && auth()->user()->isNot($impersonateUser)
+        && $impersonateUser->canBeImpersonated()
+    ) {
+        $suplantarId = 'impersonate-'.$impersonateUser->getKey();
+    }
+@endphp
+
+{{-- El formulario queda fuera del grupo: Bootstrap solo une los .btn que son hijos directos. --}}
+@if ($suplantarId)
+    <form id="{{ $suplantarId }}" method="POST" action="{{ route('impersonate', $impersonateUser) }}" hidden>
+        @csrf
+    </form>
+@endif
+
 <div class="btn-group btn-group-sm" role="group">
-    @isset($impersonateUser)
-        @canImpersonate
-            @canBeImpersonated($impersonateUser)
-                <form method="POST" action="{{ route('impersonate', $impersonateUser) }}" class="d-contents">
-                    @csrf
-                    <button type="submit" class="btn btn-outline-secondary" title="Ingresar como este usuario">
-                        <i class="bi bi-person-bounding-box"></i>
-                    </button>
-                </form>
-            @endCanBeImpersonated
-        @endCanImpersonate
-    @endisset
+    @if ($suplantarId)
+        <button type="submit" form="{{ $suplantarId }}" class="btn btn-outline-secondary" title="Ingresar como este usuario">
+            <i class="bi bi-person-bounding-box"></i>
+        </button>
+    @endif
     @can($editPermission)
         <a href="{{ $editUrl }}" class="btn btn-outline-primary" title="Editar">
             <i class="bi bi-pencil-square"></i>

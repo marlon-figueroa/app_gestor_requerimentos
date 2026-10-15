@@ -70,7 +70,10 @@ class ImpersonateTest extends TestCase
             ->json('data'))
             ->pluck('acciones', 'id');
 
-        $this->assertStringContainsString(route('impersonate', $usuario), $acciones[$usuario->id]);
+        $this->assertMatchesRegularExpression(
+            '/<div class="btn-group btn-group-sm" role="group">\s*<button type="submit" form="impersonate-'.$usuario->id.'" class="btn btn-outline-secondary"/',
+            $acciones[$usuario->id]
+        );
         $this->assertStringNotContainsString(route('impersonate', $admin), $acciones[$admin->id]);
     }
 
