@@ -1,7 +1,8 @@
 import './bootstrap';
 import $ from './libs/jquery';
 import { initSelect2 } from './libs/select2';
-import DataTable, { serverTable, reloadTables } from './libs/datatables';
+import DataTable, { serverTable, reloadTables, reloadTable } from './libs/datatables';
+import { initComponents, initDataTableComponents, onTable, tables } from './libs/components';
 import { initDatePickers, TempusDominus, DateTime } from './libs/tempus-dominus';
 import { notify, registerDeleteHandler } from './libs/helpers';
 import { initTheme, setTheme, getStoredTheme, resolveTheme } from './libs/theme';
@@ -17,6 +18,10 @@ window.App = {
     DataTable,
     serverTable,
     reloadTables,
+    reloadTable,
+    tables,
+    onTable,
+    initDataTableComponents,
     initSelect2,
     initDatePickers,
     TempusDominus,
@@ -43,6 +48,7 @@ initSidebar();
 initFeatherIcons();
 initSelect2();
 initDatePickers();
+initComponents();
 registerDeleteHandler();
 initAlerts();
 

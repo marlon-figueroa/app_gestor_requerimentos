@@ -42,6 +42,21 @@ export function reloadTables() {
     DataTable.tables({ api: true }).ajax.reload(null, false);
 }
 
+/**
+ * Recarga una sola tabla (id o elemento). Devuelve false si no es una DataTable.
+ */
+export function reloadTable(table) {
+    const element = typeof table === 'string' ? document.getElementById(table) : table;
+
+    if (!element || !DataTable.isDataTable(element)) {
+        return false;
+    }
+
+    new DataTable.Api(element).ajax.reload(null, false);
+
+    return true;
+}
+
 window.DataTable = DataTable;
 
 export default DataTable;

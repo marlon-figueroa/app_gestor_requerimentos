@@ -1,11 +1,12 @@
-import { reloadTables } from './datatables';
+import { reloadTable, reloadTables } from './datatables';
 import { notify, confirmAction, alertMessage } from './alerts';
 
 export { notify, confirmAction, alertMessage };
 
 /**
- * Elimina un recurso via Axios (DELETE) tras confirmar y recarga las DataTables.
- * Uso: <button data-delete-url="..." data-confirm="...">.
+ * Elimina un recurso via Axios (DELETE) tras confirmar. Recarga la DataTable que
+ * contiene el boton (o todas) o, si tiene data-redirect, navega a esa URL.
+ * Uso: <button data-delete-url="..." data-confirm="..." data-redirect="...">.
  */
 export function registerDeleteHandler() {
     document.addEventListener('click', async (event) => {
@@ -32,9 +33,19 @@ export function registerDeleteHandler() {
 
         window.axios
             .delete(button.dataset.deleteUrl)
-            .then(({ data }) => {
-                notify(data.message || 'Registro eliminado correctamente.');
-                reloadTables();
+            .then(async ({ data }) => {
+                const redirect = button.dataset.redirect;
+                const table = button.closest('table');
+
+                if (!redirect && !reloadTable(table)) {
+                    reloadTables();
+                }
+
+                await notify(data.message || 'Registro eliminado correctamente.');
+
+                if (redirect) {
+                    window.location.assign(redirect);
+                }
             })
             .catch((error) => {
                 alertMessage({
