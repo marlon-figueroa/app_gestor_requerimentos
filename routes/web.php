@@ -5,12 +5,16 @@ use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Proyectos\AdjuntoController as ProyectoAdjuntoController;
+use App\Http\Controllers\Proyectos\FlujoController as ProyectoFlujoController;
+use App\Http\Controllers\Proyectos\ProyectoController;
 use App\Http\Controllers\Requerimientos\AdjuntoController;
 use App\Http\Controllers\Requerimientos\CalendarioController;
 use App\Http\Controllers\Requerimientos\CasoUsoController;
 use App\Http\Controllers\Requerimientos\FlujoController;
 use App\Http\Controllers\Requerimientos\KanbanController;
 use App\Http\Controllers\Requerimientos\RequerimientoController;
+use App\Services\ProyectoFlujoService;
 use App\Services\RequerimientoFlujoService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -57,6 +61,23 @@ Route::middleware('auth')->group(function () {
             ->parameters(['permisos' => 'permission'])
             ->except('show');
     });
+
+    Route::prefix('proyectos')->name('proyectos.')->group(function () {
+        Route::post('data', [ProyectoController::class, 'data'])->name('data');
+        Route::get('{proyecto}/pdf', [ProyectoController::class, 'pdf'])->name('pdf');
+        Route::post('{proyecto}/flujo/{accion}', ProyectoFlujoController::class)
+            ->name('flujo')
+            ->whereIn('accion', array_keys(ProyectoFlujoService::ACCIONES));
+
+        Route::scopeBindings()->group(function () {
+            Route::post('{proyecto}/adjuntos', [ProyectoAdjuntoController::class, 'store'])->name('adjuntos.store');
+            Route::get('{proyecto}/adjuntos/{adjunto}', [ProyectoAdjuntoController::class, 'show'])->name('adjuntos.show');
+            Route::get('{proyecto}/adjuntos/{adjunto}/descargar', [ProyectoAdjuntoController::class, 'descargar'])->name('adjuntos.descargar');
+            Route::delete('{proyecto}/adjuntos/{adjunto}', [ProyectoAdjuntoController::class, 'destroy'])->name('adjuntos.destroy');
+        });
+    });
+
+    Route::resource('proyectos', ProyectoController::class)->except('destroy');
 
     Route::prefix('requerimientos')->name('requerimientos.')->group(function () {
         Route::post('data', [RequerimientoController::class, 'data'])->name('data');

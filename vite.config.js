@@ -18,6 +18,8 @@ export default defineConfig({
                 'resources/js/pages/requerimiento-show.js',
                 'resources/js/pages/requerimientos-kanban.js',
                 'resources/js/pages/requerimientos-calendario.js',
+                'resources/js/pages/proyecto-form.js',
+                'resources/js/pages/proyecto-show.js',
             ],
             refresh: true,
         }),

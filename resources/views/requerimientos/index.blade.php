@@ -26,18 +26,20 @@
         @if ($bandeja)
             <input type="hidden" name="bandeja" value="1">
         @else
-            <x-form.select name="estado" label="Estado" :options="$estados" placeholder="Todos los estados" allow-clear col="col-md-3" />
+            <x-form.select name="estado" label="Estado" :options="$estados" placeholder="Todos los estados" allow-clear col="col-md-2" />
         @endif
-        <x-form.input name="fecha_desde" label="Vence desde" type="date" col="col-md-3" />
-        <x-form.input name="fecha_hasta" label="Vence hasta" type="date" col="col-md-3" />
+        <x-form.select name="proyecto_id" label="Proyecto" :options="$proyectos" placeholder="Todos los proyectos" allow-clear col="col-md-3" />
+        <x-form.input name="fecha_desde" label="Vence desde" type="date" col="col-md-2" />
+        <x-form.input name="fecha_hasta" label="Vence hasta" type="date" col="col-md-2" />
         <x-form.checkbox name="vencidos" label="Solo vencidos" switch col="col-md-1 pb-2" />
     </x-filters>
 
     <x-datatable id="tabla-requerimientos" :url="route('requerimientos.data')" filters="filtros-requerimientos"
-                 :order="[[6, 'asc']]"
+                 :order="[[7, 'asc']]"
                  :columns="[
                      ['data' => 'codigo', 'label' => 'Código'],
                      ['data' => 'titulo', 'label' => 'Título'],
+                     ['data' => 'proyecto', 'name' => 'proyecto.nombre', 'label' => 'Proyecto'],
                      ['data' => 'solicitante', 'name' => 'solicitante.name', 'label' => 'Solicitante'],
                      ['data' => 'gestor', 'name' => 'gestor.name', 'label' => 'Gestor'],
                      ['data' => 'estado', 'label' => 'Estado', 'searchable' => false],

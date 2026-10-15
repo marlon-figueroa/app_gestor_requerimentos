@@ -3,6 +3,7 @@
 namespace Tests\Feature\Requerimientos;
 
 use App\Enums\EstadoRequerimiento;
+use App\Models\Proyecto;
 use App\Models\Requerimiento;
 use App\Models\RequerimientoAdjunto;
 use App\Models\User;
@@ -40,6 +41,7 @@ class RequerimientoAdjuntosTest extends TestCase
     public function test_adjuntos_al_crear_se_guardan_en_disco_privado(): void
     {
         $this->actingAs($this->solicitante)->post(route('requerimientos.store'), [
+            'proyecto_id' => Proyecto::factory()->create()->id,
             'titulo' => 'Con adjuntos',
             'descripcion' => 'Detalle',
             'fecha_solicitud' => '01/10/2026',

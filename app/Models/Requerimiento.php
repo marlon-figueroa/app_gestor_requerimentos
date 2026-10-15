@@ -20,6 +20,7 @@ class Requerimiento extends Model
     protected $table = 'requerimientos';
 
     protected $fillable = [
+        'proyecto_id',
         'titulo',
         'descripcion',
         'fecha_solicitud',
@@ -52,6 +53,11 @@ class Requerimiento extends Model
         static::forceDeleting(function (Requerimiento $requerimiento): void {
             $requerimiento->adjuntos()->get()->each->delete();
         });
+    }
+
+    public function proyecto(): BelongsTo
+    {
+        return $this->belongsTo(Proyecto::class);
     }
 
     public function solicitante(): BelongsTo

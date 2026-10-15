@@ -47,6 +47,10 @@
 
     <table class="datos">
         <tr>
+            <td class="etiqueta">Proyecto</td>
+            <td colspan="3">{{ $requerimiento->proyecto ? $requerimiento->proyecto->codigo.' · '.$requerimiento->proyecto->nombre : 'Sin proyecto' }}</td>
+        </tr>
+        <tr>
             <td class="etiqueta">Estado</td>
             <td><span class="estado" style="background: {{ $requerimiento->estado->hex() }}">{{ $requerimiento->estado->label() }}</span></td>
             <td class="etiqueta">Solicitante</td>

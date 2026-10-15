@@ -2,7 +2,9 @@
 
 namespace Tests\Feature\Requerimientos;
 
+use App\Enums\EstadoProyecto;
 use App\Enums\EstadoRequerimiento;
+use App\Models\Proyecto;
 use App\Models\Requerimiento;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
@@ -40,7 +42,10 @@ class RequerimientoFlujoTest extends TestCase
 
     public function test_solicitante_crea_requerimiento_en_borrador_con_codigo_e_historial(): void
     {
+        $proyecto = Proyecto::factory()->create();
+
         $respuesta = $this->actingAs($this->solicitante)->post(route('requerimientos.store'), [
+            'proyecto_id' => $proyecto->id,
             'titulo' => 'Reporte de ventas',
             'descripcion' => 'Se necesita un reporte mensual.',
             'fecha_solicitud' => '01/10/2026',
@@ -56,11 +61,51 @@ class RequerimientoFlujoTest extends TestCase
         $this->assertNull($requerimiento->gestor_id);
         $this->assertSame('2026-10-31', $requerimiento->fecha_vencimiento->toDateString());
         $this->assertSame(['crear'], $requerimiento->revisiones()->pluck('accion')->all());
+        $this->assertSame($proyecto->id, $requerimiento->proyecto_id);
+    }
+
+    public function test_el_requerimiento_exige_un_proyecto_activo(): void
+    {
+        $datos = [
+            'titulo' => 'Sin proyecto',
+            'descripcion' => 'Y',
+            'fecha_solicitud' => '01/10/2026',
+            'fecha_vencimiento' => '31/10/2026',
+        ];
+
+        $this->actingAs($this->solicitante)->post(route('requerimientos.store'), $datos)
+            ->assertSessionHasErrors('proyecto_id');
+
+        foreach ([EstadoProyecto::Finalizado, EstadoProyecto::Cancelado] as $estado) {
+            $cerrado = Proyecto::factory()->estado($estado)->create();
+
+            $this->actingAs($this->solicitante)->post(route('requerimientos.store'), [...$datos, 'proyecto_id' => $cerrado->id])
+                ->assertSessionHasErrors(['proyecto_id' => 'El proyecto seleccionado no existe o ya está cerrado.']);
+        }
+
+        $this->assertDatabaseCount('requerimientos', 0);
+    }
+
+    public function test_al_editar_se_conserva_el_proyecto_actual_aunque_este_cerrado(): void
+    {
+        $requerimiento = $this->requerimiento();
+        $requerimiento->proyecto->forceFill(['estado' => EstadoProyecto::Cancelado])->save();
+
+        $this->actingAs($this->solicitante)->put(route('requerimientos.update', $requerimiento), [
+            'proyecto_id' => $requerimiento->proyecto_id,
+            'titulo' => 'Nuevo título',
+            'descripcion' => 'Y',
+            'fecha_solicitud' => '01/10/2026',
+            'fecha_vencimiento' => '31/10/2026',
+        ])->assertSessionHasNoErrors()->assertRedirect(route('requerimientos.show', $requerimiento));
+
+        $this->assertSame('Nuevo título', $requerimiento->fresh()->titulo);
     }
 
     public function test_vencimiento_no_puede_ser_anterior_a_la_solicitud(): void
     {
         $this->actingAs($this->solicitante)->post(route('requerimientos.store'), [
+            'proyecto_id' => Proyecto::factory()->create()->id,
             'titulo' => 'X',
             'descripcion' => 'Y',
             'fecha_solicitud' => '10/10/2026',

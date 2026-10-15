@@ -120,6 +120,9 @@ class RequerimientoDiagramaTest extends TestCase
             ->get(route('requerimientos.show', $requerimiento))
             ->assertOk()
             ->assertSee('Diagrama de estados', false)
+            ->assertSee('btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#diagrama-modal"', false)
+            ->assertSee('id="diagrama-modal"', false)
+            ->assertSee('modal-diagrama', false)
             ->assertSee('id="diagrama-estados"', false)
             ->assertSee('Ana Solicitante', false)
             ->assertSee('Solicitante', false);

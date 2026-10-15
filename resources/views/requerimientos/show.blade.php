@@ -16,6 +16,9 @@
                 <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
             </a>
         @endcan
+        <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#diagrama-modal">
+            <i class="bi bi-diagram-2"></i> Diagrama de estados
+        </button>
         @can('update', $requerimiento)
             <a href="{{ route('requerimientos.edit', $requerimiento) }}" class="btn btn-outline-primary">
                 <i class="bi bi-pencil-square"></i> Editar
@@ -34,8 +37,6 @@
             ? $requerimiento->revisiones->firstWhere('accion', 'rechazar')
             : null;
     @endphp
-    @include('requerimientos.partials.diagrama')
-
     @if ($ultimoRechazo)
         <div class="alert alert-danger d-flex gap-2" role="alert">
             <i class="bi bi-exclamation-octagon fs-5"></i>
@@ -140,6 +141,20 @@
                     <dl class="row small mb-0">
                         <dt class="col-5">Estado</dt>
                         <dd class="col-7">@include('requerimientos.partials.estado', ['estado' => $requerimiento->estado])</dd>
+                        <dt class="col-5">Proyecto</dt>
+                        <dd class="col-7">
+                            @if ($requerimiento->proyecto)
+                                @can('view', $requerimiento->proyecto)
+                                    <a href="{{ route('proyectos.show', $requerimiento->proyecto) }}" class="text-decoration-none">
+                                        {{ $requerimiento->proyecto->codigo }} · {{ $requerimiento->proyecto->nombre }}
+                                    </a>
+                                @else
+                                    {{ $requerimiento->proyecto->codigo }} · {{ $requerimiento->proyecto->nombre }}
+                                @endcan
+                            @else
+                                <span class="text-body-secondary">Sin proyecto</span>
+                            @endif
+                        </dd>
                         <dt class="col-5">Solicitante</dt>
                         <dd class="col-7">{{ $requerimiento->solicitante?->name }}</dd>
                         <dt class="col-5">Gestor</dt>
@@ -207,6 +222,7 @@
         </div>
     </div>
 
+    @include('requerimientos.partials.diagrama')
     @include('requerimientos.partials.visor-adjunto')
 @endsection
 

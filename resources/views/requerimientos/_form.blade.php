@@ -3,6 +3,10 @@
     $maxMb = \App\Http\Requests\Requerimientos\AdjuntoRequest::MAX_KB / 1024;
 @endphp
 
+<x-form.select name="proyecto_id" label="Proyecto" :options="$proyectos" :selected="$requerimiento->proyecto_id"
+               placeholder="Seleccione un proyecto activo" required col="col-12"
+               help="Cada requerimiento pertenece a un único proyecto activo." />
+
 <x-form.input name="titulo" label="Título" :value="$requerimiento->titulo" required autofocus maxlength="255" col="col-12" />
 
 <x-form.textarea name="descripcion" label="Descripción" :value="$requerimiento->descripcion" rows="6" required

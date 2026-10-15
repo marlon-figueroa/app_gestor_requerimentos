@@ -22,6 +22,13 @@ return [
         'route' => 'home',
     ],
     [
+        'label' => 'Proyectos',
+        'icon' => 'briefcase',
+        'children' => [
+            ['label' => 'Listado', 'icon' => 'list', 'route' => 'proyectos.index', 'active' => ['proyectos.index', 'proyectos.create', 'proyectos.show', 'proyectos.edit'], 'can' => 'proyectos.ver'],
+        ],
+    ],
+    [
         'label' => 'Requerimientos',
         'icon' => 'clipboard',
         'children' => [

@@ -6,6 +6,7 @@ use App\Enums\EstadoRequerimiento;
 use App\Http\Controllers\Concerns\FiltraPorFechas;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Requerimientos\RequerimientoRequest;
+use App\Models\Proyecto;
 use App\Models\Requerimiento;
 use App\Models\RequerimientoAdjunto;
 use App\Services\RequerimientoDiagramaService;
@@ -27,6 +28,7 @@ class RequerimientoController extends Controller
 
         return view('requerimientos.index', [
             'estados' => EstadoRequerimiento::opciones(),
+            'proyectos' => $this->opcionesProyectos(),
             'bandeja' => false,
         ]);
     }
@@ -37,6 +39,7 @@ class RequerimientoController extends Controller
 
         return view('requerimientos.index', [
             'estados' => EstadoRequerimiento::opciones(),
+            'proyectos' => $this->opcionesProyectos(),
             'bandeja' => true,
         ]);
     }
@@ -47,13 +50,14 @@ class RequerimientoController extends Controller
 
         return DataTables::eloquent($this->filteredQuery($request))
             ->editColumn('codigo', fn (Requerimiento $r) => view('requerimientos.partials.codigo', ['requerimiento' => $r])->render())
+            ->addColumn('proyecto', fn (Requerimiento $r) => $r->proyecto ? e($r->proyecto->codigo.' · '.$r->proyecto->nombre) : '<span class="text-body-secondary">Sin proyecto</span>')
             ->addColumn('solicitante', fn (Requerimiento $r) => e($r->solicitante?->name))
             ->addColumn('gestor', fn (Requerimiento $r) => $r->gestor ? e($r->gestor->name) : '<span class="text-body-secondary">Sin asignar</span>')
             ->editColumn('estado', fn (Requerimiento $r) => view('requerimientos.partials.estado', ['estado' => $r->estado])->render())
             ->editColumn('fecha_solicitud', fn (Requerimiento $r) => $r->fecha_solicitud?->format('d/m/Y'))
             ->editColumn('fecha_vencimiento', fn (Requerimiento $r) => view('requerimientos.partials.vencimiento', ['requerimiento' => $r])->render())
             ->addColumn('acciones', fn (Requerimiento $r) => view('requerimientos.partials.acciones', ['requerimiento' => $r])->render())
-            ->rawColumns(['codigo', 'gestor', 'estado', 'fecha_vencimiento', 'acciones'])
+            ->rawColumns(['codigo', 'proyecto', 'gestor', 'estado', 'fecha_vencimiento', 'acciones'])
             ->toJson();
     }
 
@@ -63,6 +67,7 @@ class RequerimientoController extends Controller
 
         return view('requerimientos.create', [
             'requerimiento' => new Requerimiento(['fecha_solicitud' => today()]),
+            'proyectos' => Proyecto::opcionesActivas(),
         ]);
     }
 
@@ -88,7 +93,7 @@ class RequerimientoController extends Controller
     {
         $this->authorize('view', $requerimiento);
 
-        $requerimiento->load(['solicitante', 'gestor', 'casosUso', 'adjuntos.autor', 'revisiones.usuario']);
+        $requerimiento->load(['proyecto', 'solicitante', 'gestor', 'casosUso', 'adjuntos.autor', 'revisiones.usuario']);
 
         $acciones = collect(RequerimientoFlujoService::accionesPosibles($requerimiento))
             ->filter(fn (string $accion) => auth()->user()->can($accion, $requerimiento))
@@ -103,7 +108,10 @@ class RequerimientoController extends Controller
     {
         $this->authorize('update', $requerimiento);
 
-        return view('requerimientos.edit', compact('requerimiento'));
+        return view('requerimientos.edit', [
+            'requerimiento' => $requerimiento,
+            'proyectos' => Proyecto::opcionesActivas($requerimiento->proyecto_id),
+        ]);
     }
 
     public function update(RequerimientoRequest $request, Requerimiento $requerimiento)
@@ -129,7 +137,7 @@ class RequerimientoController extends Controller
     {
         $this->authorize('export', $requerimiento);
 
-        $requerimiento->load(['solicitante', 'gestor', 'casosUso', 'adjuntos', 'revisiones.usuario']);
+        $requerimiento->load(['proyecto', 'solicitante', 'gestor', 'casosUso', 'adjuntos', 'revisiones.usuario']);
 
         return Pdf::loadView('pdf.requerimiento', compact('requerimiento'))
             ->setPaper('letter')
@@ -145,13 +153,26 @@ class RequerimientoController extends Controller
         }
     }
 
+    /**
+     * @return array<int, string>
+     */
+    private function opcionesProyectos(): array
+    {
+        return Proyecto::query()
+            ->orderByDesc('id')
+            ->get(['id', 'codigo', 'nombre'])
+            ->mapWithKeys(fn (Proyecto $proyecto) => [$proyecto->id => "{$proyecto->codigo} · {$proyecto->nombre}"])
+            ->all();
+    }
+
     private function filteredQuery(Request $request): Builder
     {
         $query = Requerimiento::query()
-            ->with(['solicitante', 'gestor'])
+            ->with(['proyecto', 'solicitante', 'gestor'])
             ->select('requerimientos.*')
             ->visiblesPara($request->user())
             ->when($request->boolean('bandeja'), fn (Builder $q) => $q->bandeja())
+            ->when($request->filled('proyecto_id'), fn (Builder $q) => $q->where('requerimientos.proyecto_id', (int) $request->input('proyecto_id')))
             ->when(
                 EstadoRequerimiento::tryFrom((string) $request->input('estado')),
                 fn (Builder $q, EstadoRequerimiento $estado) => $q->where('requerimientos.estado', $estado),

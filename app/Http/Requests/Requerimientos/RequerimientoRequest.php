@@ -2,8 +2,12 @@
 
 namespace App\Http\Requests\Requerimientos;
 
+use App\Enums\EstadoProyecto;
+use App\Models\Requerimiento;
 use Carbon\Carbon;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class RequerimientoRequest extends FormRequest
 {
@@ -16,7 +20,15 @@ class RequerimientoRequest extends FormRequest
 
     public function rules(): array
     {
+        $actual = $this->route('requerimiento') instanceof Requerimiento
+            ? $this->route('requerimiento')->proyecto_id
+            : null;
+
         return [
+            'proyecto_id' => ['required', 'integer', Rule::exists('proyectos', 'id')->where(
+                fn (Builder $q) => $q->where('estado', EstadoProyecto::Activo->value)
+                    ->when($actual, fn (Builder $q) => $q->orWhere('id', $actual)),
+            )],
             'titulo' => ['required', 'string', 'max:255'],
             'descripcion' => ['required', 'string', 'max:20000'],
             'fecha_solicitud' => ['required', 'date_format:d/m/Y'],
@@ -29,12 +41,20 @@ class RequerimientoRequest extends FormRequest
     public function attributes(): array
     {
         return [
+            'proyecto_id' => 'proyecto',
             'titulo' => 'título',
             'descripcion' => 'descripción',
             'fecha_solicitud' => 'fecha de solicitud',
             'fecha_vencimiento' => 'fecha de vencimiento',
             'adjuntos' => 'archivos adjuntos',
             'adjuntos.*' => 'archivo adjunto',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'proyecto_id.exists' => 'El proyecto seleccionado no existe o ya está cerrado.',
         ];
     }
 
@@ -46,6 +66,7 @@ class RequerimientoRequest extends FormRequest
     public function datos(): array
     {
         return [
+            'proyecto_id' => (int) $this->validated('proyecto_id'),
             'titulo' => $this->validated('titulo'),
             'descripcion' => $this->validated('descripcion'),
             'fecha_solicitud' => Carbon::createFromFormat('d/m/Y', $this->validated('fecha_solicitud'))->startOfDay(),

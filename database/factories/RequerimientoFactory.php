@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Enums\EstadoRequerimiento;
+use App\Models\Proyecto;
 use App\Models\Requerimiento;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -17,6 +18,7 @@ class RequerimientoFactory extends Factory
         $solicitud = fake()->dateTimeBetween('-1 month', 'now');
 
         return [
+            'proyecto_id' => Proyecto::factory(),
             'titulo' => fake()->sentence(5),
             'descripcion' => fake()->paragraph(),
             'fecha_solicitud' => $solicitud,

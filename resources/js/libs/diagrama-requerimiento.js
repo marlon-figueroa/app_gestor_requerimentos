@@ -4,10 +4,11 @@ const FUENTE = 'Nunito, sans-serif';
 const ESTADO = { width: 128, height: 56 };
 const ANCHO_DETALLE = 248;
 const CABECERA = 36;
+const CABECERA_ACTUAL = 48;
 const ALTO_LINEA = 13;
 const SEPARACION_EVENTO = 8;
 const RELLENO_INFERIOR = 10;
-const MAX_CARACTERES = 36;
+const MAX_CARACTERES = 44;
 const MAX_LINEAS_OBSERVACION = 3;
 const INICIAL = { width: 24, height: 24 };
 const FINAL = { width: 28, height: 28 };
@@ -181,11 +182,15 @@ function limitarLineas(lineas, maximo) {
 }
 
 function lineasEvento(paso) {
-    const actor = [paso.actor, paso.fecha].filter(Boolean).join(' · ');
-    const lineas = [
-        ...partirLinea(`#${paso.numero} ${paso.accion}`, MAX_CARACTERES),
-        ...partirLinea(actor, MAX_CARACTERES),
-    ];
+    const lineas = partirLinea(`#${paso.numero} ${paso.accion}`, MAX_CARACTERES);
+
+    if (paso.actor) {
+        lineas.push(...partirLinea(paso.actor, MAX_CARACTERES));
+    }
+
+    if (paso.fecha) {
+        lineas.push(paso.fecha);
+    }
 
     if (paso.observaciones) {
         lineas.push(...limitarLineas(partirLinea(paso.observaciones, MAX_CARACTERES), MAX_LINEAS_OBSERVACION));
@@ -194,12 +199,13 @@ function lineasEvento(paso) {
     return lineas;
 }
 
-function medirEstado(eventos = []) {
+function medirEstado(eventos = [], actual = false) {
     if (!eventos.length) {
-        return { width: ESTADO.width, height: ESTADO.height, bloques: [] };
+        return { width: ESTADO.width, height: ESTADO.height, bloques: [], cabecera: CABECERA };
     }
 
-    let cursor = CABECERA + 8;
+    const cabecera = actual ? CABECERA_ACTUAL : CABECERA;
+    let cursor = cabecera + 8;
     const bloques = eventos.map((paso) => {
         const lineas = lineasEvento(paso);
         const bloque = {
@@ -218,11 +224,12 @@ function medirEstado(eventos = []) {
         width: ANCHO_DETALLE,
         height: cursor - SEPARACION_EVENTO + RELLENO_INFERIOR,
         bloques,
+        cabecera,
     };
 }
 
 function medidasEstados(estados) {
-    return new Map(estados.map((estado) => [estado.id, medirEstado(estado.eventos ?? [])]));
+    return new Map(estados.map((estado) => [estado.id, medirEstado(estado.eventos ?? [], Boolean(estado.actual))]));
 }
 
 function markupEstado(cantidad) {
@@ -257,11 +264,11 @@ function acumular(medidas, hueco, inicio) {
     return { inicios, total: posicion - hueco };
 }
 
-function calcularDisposicion(ids, orientacion, medidas) {
+function calcularDisposicion(ids, orientacion, medidas, ubicacion = UBICACION) {
     const o = ORIENTACIONES[orientacion];
     const ejes = (medida) => (o.principal === 'x' ? [medida.width, medida.height] : [medida.height, medida.width]);
     const nodos = ids.map((id, indice) => {
-        const [principal, cruzado] = UBICACION[id] ?? [indice, 2];
+        const [principal, cruzado] = ubicacion[id] ?? [indice, 2];
         const [largo, ancho] = ejes(tamano(id, medidas));
 
         return { id, principal, cruzado, largo, ancho };
@@ -390,14 +397,14 @@ function crearNodo(id, estado, posicion, alcanzado, colores, medida) {
         estereotipo: { text: estado.actual ? '«actual»' : '', fill: colores.texto },
         nombre: {
             text: estado.nombre,
-            y: bloques.length ? (estado.actual ? 26 : 20) : 'calc(h/2)',
+            y: bloques.length ? (estado.actual ? 32 : 20) : (estado.actual ? 36 : 'calc(h/2)'),
             fill: estado.visitado || estado.actual ? colores.texto : colores.muted,
         },
         pista: { text: detalle === '' ? `${estado.nombre} (${pista})` : `${estado.nombre} (${pista})\n${detalle}` },
     };
 
     if (bloques.length) {
-        attrs.separador = { stroke: colores.borde };
+        attrs.separador = { stroke: colores.borde, y1: medida.cabecera, y2: medida.cabecera };
 
         bloques.forEach((bloque, indice) => {
             attrs[`evento-${indice}`] = {
@@ -466,6 +473,7 @@ export function initDiagramaEstados(contenedor, datos) {
 
     const estados = new Map(datos.estados.map((estado) => [estado.id, estado]));
     const medidas = medidasEstados(datos.estados);
+    const ubicacion = datos.ubicacion ?? UBICACION;
     const ids = [INICIO, ...estados.keys(), FIN];
     const finalAlcanzado = datos.transiciones.some((t) => t.destino === FIN && estados.get(t.origen)?.actual);
     let papel = null;
@@ -480,10 +488,10 @@ export function initDiagramaEstados(contenedor, datos) {
 
         papel?.remove();
 
-        const horizontal = calcularDisposicion(ids, 'horizontal', medidas);
+        const horizontal = calcularDisposicion(ids, 'horizontal', medidas, ubicacion);
         const disposicion = disponible >= horizontal.ancho * ESCALA_MINIMA_HORIZONTAL
             ? horizontal
-            : calcularDisposicion(ids, 'vertical', medidas);
+            : calcularDisposicion(ids, 'vertical', medidas, ubicacion);
         const proporcion = disponible / disposicion.ancho;
         const escala = proporcion >= 0.8 ? Math.min(1, proporcion) : 1;
         const colores = coloresTema();
@@ -543,6 +551,10 @@ export function initDiagramaEstados(contenedor, datos) {
     });
 
     observador.observe(contenedor);
+    contenedor.closest('.modal')?.addEventListener('shown.bs.modal', () => {
+        ultimoAncho = 0;
+        dibujar();
+    });
     document.addEventListener('theme:changed', () => {
         ultimoAncho = 0;
         dibujar();
