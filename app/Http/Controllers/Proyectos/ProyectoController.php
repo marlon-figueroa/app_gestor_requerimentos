@@ -9,6 +9,7 @@ use App\Http\Requests\Proyectos\ProyectoRequest;
 use App\Models\Proyecto;
 use App\Models\ProyectoAdjunto;
 use App\Services\ProyectoDiagramaService;
+use App\Services\ProyectoEvaluacionDiagnosticoService;
 use App\Services\ProyectoFlujoService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Eloquent\Builder;
@@ -74,11 +75,11 @@ class ProyectoController extends Controller
         return redirect()->route('proyectos.show', $proyecto)->with('success', 'Proyecto creado y activo.');
     }
 
-    public function show(Proyecto $proyecto, ProyectoDiagramaService $diagrama)
+    public function show(Proyecto $proyecto, ProyectoDiagramaService $diagrama, ProyectoEvaluacionDiagnosticoService $diagnosticoPf)
     {
         $this->authorize('view', $proyecto);
 
-        $proyecto->load(['responsable', 'creador', 'adjuntos.autor', 'revisiones.usuario', 'requerimientos.solicitante', 'requerimientos.gestor']);
+        $proyecto->load(['responsable', 'creador', 'adjuntos.autor', 'revisiones.usuario', 'requerimientos.solicitante', 'requerimientos.gestor', 'evaluacionesPf.creador']);
 
         $acciones = collect(ProyectoFlujoService::accionesPosibles($proyecto))
             ->filter(fn (string $accion) => auth()->user()->can($accion, $proyecto))
@@ -88,7 +89,12 @@ class ProyectoController extends Controller
 
         $diagrama = $diagrama->diagrama($proyecto);
 
-        return view('proyectos.show', compact('proyecto', 'acciones', 'pendientes', 'diagrama'));
+        $ultimaEvaluacionPf = $proyecto->evaluacionesPf->first();
+        $diagnosticoPfUltima = $ultimaEvaluacionPf
+            ? $diagnosticoPf->diagnosticar($proyecto, $ultimaEvaluacionPf)
+            : null;
+
+        return view('proyectos.show', compact('proyecto', 'acciones', 'pendientes', 'diagrama', 'ultimaEvaluacionPf', 'diagnosticoPfUltima'));
     }
 
     public function edit(Proyecto $proyecto)

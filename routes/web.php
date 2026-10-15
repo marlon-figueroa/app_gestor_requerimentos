@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Proyectos\AdjuntoController as ProyectoAdjuntoController;
+use App\Http\Controllers\Proyectos\EvaluacionPfController;
 use App\Http\Controllers\Proyectos\FlujoController as ProyectoFlujoController;
 use App\Http\Controllers\Proyectos\ProyectoController;
 use App\Http\Controllers\Requerimientos\AdjuntoController;
@@ -75,6 +76,15 @@ Route::middleware('auth')->group(function () {
             Route::get('{proyecto}/adjuntos/{adjunto}/descargar', [ProyectoAdjuntoController::class, 'descargar'])->name('adjuntos.descargar');
             Route::delete('{proyecto}/adjuntos/{adjunto}', [ProyectoAdjuntoController::class, 'destroy'])->name('adjuntos.destroy');
         });
+
+        Route::get('{proyecto}/evaluaciones-pf', [EvaluacionPfController::class, 'index'])->name('evaluaciones-pf.index');
+        Route::get('{proyecto}/evaluaciones-pf/create', [EvaluacionPfController::class, 'create'])->name('evaluaciones-pf.create');
+        Route::post('{proyecto}/evaluaciones-pf', [EvaluacionPfController::class, 'store'])->name('evaluaciones-pf.store');
+        Route::get('{proyecto}/evaluaciones-pf/{evaluacion_pf}', [EvaluacionPfController::class, 'show'])->name('evaluaciones-pf.show');
+        Route::get('{proyecto}/evaluaciones-pf/{evaluacion_pf}/edit', [EvaluacionPfController::class, 'edit'])->name('evaluaciones-pf.edit');
+        Route::put('{proyecto}/evaluaciones-pf/{evaluacion_pf}', [EvaluacionPfController::class, 'update'])->name('evaluaciones-pf.update');
+        Route::delete('{proyecto}/evaluaciones-pf/{evaluacion_pf}', [EvaluacionPfController::class, 'destroy'])->name('evaluaciones-pf.destroy');
+        Route::get('{proyecto}/evaluaciones-pf/{evaluacion_pf}/pdf', [EvaluacionPfController::class, 'pdf'])->name('evaluaciones-pf.pdf');
     });
 
     Route::resource('proyectos', ProyectoController::class)->except('destroy');

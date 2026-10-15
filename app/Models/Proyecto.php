@@ -80,6 +80,11 @@ class Proyecto extends Model
         return $this->hasMany(ProyectoRevision::class)->orderByDesc('created_at')->orderByDesc('id');
     }
 
+    public function evaluacionesPf(): HasMany
+    {
+        return $this->hasMany(ProyectoEvaluacionPf::class)->orderByDesc('created_at')->orderByDesc('id');
+    }
+
     /**
      * Vencido: pasó la fecha de finalización y sigue activo.
      */

@@ -19,7 +19,7 @@ class RolesAndPermissionsSeeder extends Seeder
         'bitacora' => ['ver', 'exportar', 'invalidar_sesion'],
         'monitoreo' => ['pulse', 'logs'],
         'requerimientos' => ['ver', 'crear', 'editar', 'eliminar', 'exportar', 'revisar'],
-        'proyectos' => ['ver', 'crear', 'editar', 'cerrar', 'exportar'],
+        'proyectos' => ['ver', 'crear', 'editar', 'cerrar', 'exportar', 'evaluar'],
     ];
 
     public function run(): void
@@ -40,6 +40,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'proyectos.editar',
             'proyectos.cerrar',
             'proyectos.exportar',
+            'proyectos.evaluar',
         ]);
         Role::findOrCreate('Usuario', 'web')->syncPermissions([
             'requerimientos.ver',

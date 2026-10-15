@@ -21,6 +21,11 @@
         <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#diagrama-modal">
             <i class="bi bi-diagram-2"></i> Diagrama de estados
         </button>
+        @can('viewAny', \App\Models\ProyectoEvaluacionPf::class)
+            <a href="{{ route('proyectos.evaluaciones-pf.index', $proyecto) }}" class="btn btn-outline-secondary">
+                <i class="bi bi-calculator"></i> Puntos de función
+            </a>
+        @endcan
         @can('update', $proyecto)
             <a href="{{ route('proyectos.edit', $proyecto) }}" class="btn btn-outline-primary">
                 <i class="bi bi-pencil-square"></i> Editar
@@ -165,6 +170,40 @@
         </div>
 
         <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <span><i class="bi bi-calculator me-1"></i> Puntos de función</span>
+                    <a href="{{ route('proyectos.evaluaciones-pf.index', $proyecto) }}" class="small">Ver todas</a>
+                </div>
+                <div class="card-body small">
+                    @if ($ultimaEvaluacionPf)
+                        <p class="mb-2 fw-semibold">{{ $ultimaEvaluacionPf->nombre }}</p>
+                        <dl class="row mb-0">
+                            <dt class="col-7">PF sin ajuste</dt>
+                            <dd class="col-5 text-end">{{ $ultimaEvaluacionPf->total_sin_ajuste }}</dd>
+                            <dt class="col-7">PF ajustados</dt>
+                            <dd class="col-5 text-end fw-bold text-primary">{{ number_format($ultimaEvaluacionPf->total_ajustado, 2, ',', '.') }}</dd>
+                            @if ($diagnosticoPfUltima)
+                                <dt class="col-7">Viabilidad</dt>
+                                <dd class="col-5 text-end">
+                                    <span class="badge text-bg-{{ $diagnosticoPfUltima['viabilidad']->color() }}">{{ $diagnosticoPfUltima['viabilidad']->label() }}</span>
+                                </dd>
+                                <dt class="col-7">Tiempo est.</dt>
+                                <dd class="col-5 text-end">{{ $diagnosticoPfUltima['tiempo']['dias_laborables'] }} días lab.</dd>
+                            @endif
+                            <dt class="col-7">Actualizada</dt>
+                            <dd class="col-5 text-end">{{ $ultimaEvaluacionPf->updated_at?->format('d/m/Y') }}</dd>
+                        </dl>
+                        <a href="{{ route('proyectos.evaluaciones-pf.show', [$proyecto, $ultimaEvaluacionPf]) }}" class="btn btn-sm btn-outline-secondary mt-3 w-100">Abrir evaluación</a>
+                    @else
+                        <p class="text-body-secondary mb-0">Sin evaluación IFPUG registrada.</p>
+                        @can('create', [\App\Models\ProyectoEvaluacionPf::class, $proyecto])
+                            <a href="{{ route('proyectos.evaluaciones-pf.create', $proyecto) }}" class="btn btn-sm btn-primary mt-3 w-100">Nueva evaluación</a>
+                        @endcan
+                    @endif
+                </div>
+            </div>
+
             <div class="card mb-4">
                 <div class="card-header"><i class="bi bi-info-circle me-1"></i> Datos generales</div>
                 <div class="card-body">

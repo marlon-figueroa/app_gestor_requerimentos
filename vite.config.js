@@ -20,6 +20,7 @@ export default defineConfig({
                 'resources/js/pages/requerimientos-calendario.js',
                 'resources/js/pages/proyecto-form.js',
                 'resources/js/pages/proyecto-show.js',
+                'resources/js/pages/proyecto-evaluacion-pf-form.js',
             ],
             refresh: true,
         }),

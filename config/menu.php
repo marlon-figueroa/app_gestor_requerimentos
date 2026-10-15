@@ -25,7 +25,7 @@ return [
         'label' => 'Proyectos',
         'icon' => 'briefcase',
         'children' => [
-            ['label' => 'Listado', 'icon' => 'list', 'route' => 'proyectos.index', 'active' => ['proyectos.index', 'proyectos.create', 'proyectos.show', 'proyectos.edit'], 'can' => 'proyectos.ver'],
+            ['label' => 'Listado', 'icon' => 'list', 'route' => 'proyectos.index', 'active' => ['proyectos.index', 'proyectos.create', 'proyectos.show', 'proyectos.edit', 'proyectos.evaluaciones-pf.*'], 'can' => 'proyectos.ver'],
         ],
     ],
     [
