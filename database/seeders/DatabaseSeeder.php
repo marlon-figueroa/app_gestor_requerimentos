@@ -12,14 +12,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(RolesAndPermissionsSeeder::class);
+        $this->call([
+            RolesAndPermissionsSeeder::class,
+            UsuariosSeeders::class,
+        ]);
 
-        User::firstOrCreate(
-            ['email' => 'admin@example.com'],
-            ['name' => 'Administrador', 'password' => 'password', 'email_verified_at' => now()],
-        )->assignRole('Administrador');
-
-        if (app()->isLocal() && User::count() < 2) {
+        if (app()->isLocal() && User::role('Usuario')->doesntExist()) {
             User::factory(15)
                 ->sequence(fn () => ['created_at' => now()->subDays(random_int(0, 90))])
                 ->create()
