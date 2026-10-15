@@ -29,6 +29,9 @@ jobs:
       - name: Instalar dependencias PHP
         run: composer install --no-interaction --prefer-dist
 
+      - name: Clave de aplicación para tests
+        run: echo "APP_KEY=base64:$(openssl rand -base64 32)" >> "$GITHUB_ENV"
+
       - name: Instalar dependencias front-end
         run: npm ci --no-audit --no-fund
 

@@ -34,7 +34,8 @@
 
 ## 2. GitHub Pages (landing)
 
-1. GitHub → **Settings → Pages** → Source: **GitHub Actions**.
+1. GitHub → **Settings → Pages** → Build and deployment → Source: **GitHub Actions** (obligatorio la primera vez; el workflow también intenta activarlo con `enablement: true`).
+   - Si falla con *Get Pages site failed*, casi siempre falta este paso o el repo no tiene permisos de Pages en el plan de la org.
 2. Opcional: **Variables** → `DEMO_APP_URL` = URL de Render (si no, la landing usa un placeholder).
 3. El workflow [`.github/workflows/pages.yml`](../.github/workflows/pages.yml) publica `docs/` en cada push a `main`.
 
