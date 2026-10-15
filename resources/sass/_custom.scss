@@ -69,13 +69,50 @@ body {
         align-self: flex-start;
         width: $sidebar-width;
         height: 100vh;
+        overflow-x: hidden;
         overflow-y: auto;
         background-color: var(--app-sidebar-bg);
-        @include transition(margin-left 0.2s ease-in-out, visibility 0.2s);
+        @include transition(width 0.2s ease-in-out);
 
         .sidebar-collapsed & {
-            margin-left: -$sidebar-width;
-            visibility: hidden;
+            width: $sidebar-width-collapsed;
+        }
+    }
+}
+
+.sidebar-collapsed {
+    @include media-breakpoint-up(lg) {
+        .app-sidebar-brand {
+            justify-content: center;
+            padding-inline: 0.5rem;
+
+            > a {
+                justify-content: center;
+            }
+
+            .text-truncate {
+                display: none;
+            }
+        }
+
+        .app-sidebar-nav {
+            padding-inline: 0.5rem;
+
+            .nav-link,
+            .app-sidebar-branch {
+                justify-content: center;
+                gap: 0;
+                padding-inline: 0.5rem;
+            }
+
+            .text-truncate,
+            .app-sidebar-chevron {
+                display: none;
+            }
+
+            .collapse {
+                display: none !important;
+            }
         }
     }
 }

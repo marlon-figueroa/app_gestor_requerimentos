@@ -1,7 +1,7 @@
 <aside class="app-sidebar">
     <div class="offcanvas-lg offcanvas-start app-sidebar-panel" tabindex="-1" id="app-sidebar" aria-labelledby="app-sidebar-label">
         <div class="app-sidebar-brand">
-            <a href="{{ route('home') }}" class="d-flex align-items-center gap-2 text-decoration-none" id="app-sidebar-label">
+            <a href="{{ route('home') }}" class="d-flex align-items-center gap-2 text-decoration-none" id="app-sidebar-label" title="{{ config('app.name', 'Laravel') }}">
                 <span class="app-sidebar-brand-mark" aria-hidden="true">
                     <i data-feather="clipboard"></i>
                 </span>

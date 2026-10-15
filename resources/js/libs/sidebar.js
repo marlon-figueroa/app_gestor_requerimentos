@@ -1,6 +1,6 @@
 /**
- * Boton de menu del topbar: en escritorio (>= lg) colapsa/expande el sidebar y recuerda
- * la preferencia; en pantallas pequenas abre el sidebar como offcanvas.
+ * Boton de menu del topbar: en escritorio (>= lg) estrecha el sidebar (solo iconos) o lo
+ * expande, y recuerda la preferencia; en pantallas pequenas abre el sidebar como offcanvas.
  */
 const STORAGE_KEY = 'sidebar';
 const desktop = window.matchMedia('(min-width: 992px)');
