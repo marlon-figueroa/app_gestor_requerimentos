@@ -61,6 +61,45 @@ class RequerimientoDiagramaTest extends TestCase
         $this->assertSame('Aprobado', $pasos[3]['etapa']);
     }
 
+    public function test_el_diagrama_es_una_maquina_de_estados_con_las_transiciones_recorridas(): void
+    {
+        $solicitante = User::factory()->create()->assignRole('Usuario');
+        $gestor = User::factory()->create()->assignRole('Gestor');
+
+        $requerimiento = Requerimiento::factory()->create([
+            'solicitante_id' => $solicitante->id,
+            'gestor_id' => $gestor->id,
+            'estado' => EstadoRequerimiento::EnRevision,
+        ]);
+
+        foreach ([
+            ['usuario_id' => $solicitante->id, 'accion' => 'crear', 'estado_anterior' => null, 'estado_nuevo' => EstadoRequerimiento::Borrador],
+            ['usuario_id' => $solicitante->id, 'accion' => 'enviar', 'estado_anterior' => EstadoRequerimiento::Borrador, 'estado_nuevo' => EstadoRequerimiento::EnRevision],
+            ['usuario_id' => $gestor->id, 'accion' => 'tomar', 'estado_anterior' => EstadoRequerimiento::EnRevision, 'estado_nuevo' => EstadoRequerimiento::EnRevision],
+            ['usuario_id' => $gestor->id, 'accion' => 'rechazar', 'estado_anterior' => EstadoRequerimiento::EnRevision, 'estado_nuevo' => EstadoRequerimiento::Rechazado],
+            ['usuario_id' => $solicitante->id, 'accion' => 'enviar', 'estado_anterior' => EstadoRequerimiento::Rechazado, 'estado_nuevo' => EstadoRequerimiento::EnRevision],
+        ] as $paso) {
+            $requerimiento->revisiones()->create($paso);
+        }
+
+        $diagrama = app(RequerimientoDiagramaService::class)->diagrama($requerimiento->fresh());
+
+        $estados = collect($diagrama['estados'])->keyBy('id');
+        $this->assertCount(count(EstadoRequerimiento::cases()), $estados);
+        $this->assertTrue($estados['en_revision']['actual']);
+        $this->assertTrue($estados['rechazado']['visitado']);
+        $this->assertFalse($estados['aprobado']['visitado']);
+
+        $transiciones = collect($diagrama['transiciones'])->keyBy(fn ($t) => "{$t['origen']}>{$t['destino']}");
+        $this->assertSame([1], $transiciones['inicio>borrador']['pasos']);
+        $this->assertSame([3], $transiciones['en_revision>en_revision']['pasos']);
+        $this->assertSame(['rechazar'], $transiciones['en_revision>rechazado']['eventos']);
+        $this->assertTrue($transiciones['en_revision>rechazado']['rechazo']);
+        $this->assertSame([5], $transiciones['rechazado>en_revision']['pasos']);
+        $this->assertSame([], $transiciones['en_revision>aprobado']['pasos']);
+        $this->assertSame([], $transiciones['finalizado>fin']['pasos']);
+    }
+
     public function test_la_vista_del_requerimiento_incluye_el_diagrama(): void
     {
         $solicitante = User::factory()->create(['name' => 'Ana Solicitante'])->assignRole('Usuario');
@@ -74,8 +113,8 @@ class RequerimientoDiagramaTest extends TestCase
         $this->actingAs($solicitante)
             ->get(route('requerimientos.show', $requerimiento))
             ->assertOk()
-            ->assertSee('Diagrama de pasos', false)
-            ->assertSee('id="diagrama-pasos"', false)
+            ->assertSee('Diagrama de estados', false)
+            ->assertSee('id="diagrama-estados"', false)
             ->assertSee('Ana Solicitante', false)
             ->assertSee('Solicitante', false);
     }

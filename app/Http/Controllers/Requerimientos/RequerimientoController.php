@@ -94,9 +94,9 @@ class RequerimientoController extends Controller
             ->filter(fn (string $accion) => auth()->user()->can($accion, $requerimiento))
             ->values();
 
-        $pasos = $diagrama->pasos($requerimiento);
+        $diagrama = $diagrama->diagrama($requerimiento);
 
-        return view('requerimientos.show', compact('requerimiento', 'acciones', 'pasos'));
+        return view('requerimientos.show', compact('requerimiento', 'acciones', 'diagrama'));
     }
 
     public function edit(Requerimiento $requerimiento)

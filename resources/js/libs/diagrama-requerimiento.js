@@ -1,178 +1,389 @@
 import { dia, shapes } from '@joint/core';
 
-const ANCHO = 250;
-const ALTO = 168;
-const SEPARACION_X = 64;
-const SEPARACION_Y = 72;
-const MARGEN = 8;
+const FUENTE = 'Nunito, sans-serif';
+const ESTADO = { width: 128, height: 56 };
+const INICIAL = { width: 24, height: 24 };
+const FINAL = { width: 28, height: 28 };
+const MARGEN = 12;
+const ALTURA_BUCLE = 30;
+const APERTURA_BUCLE = 18;
+const SEPARACION_PARALELA = 26;
+const ESCALA_MINIMA_HORIZONTAL = 0.75;
+const INICIO = 'inicio';
+const FIN = 'fin';
 
-const Paso = dia.Element.define('app.Paso', {
-    size: { width: ANCHO, height: ALTO },
+const UBICACION = {
+    [INICIO]: [0, 0],
+    borrador: [1, 0],
+    en_revision: [2, 0],
+    rechazado: [2, 1],
+    aprobado: [3, 0],
+    en_desarrollo: [4, 0],
+    finalizado: [5, 0],
+    [FIN]: [6, 0],
+};
+
+const ORIENTACIONES = {
+    horizontal: {
+        principal: 'x',
+        inicioPrincipal: 'left',
+        finPrincipal: 'right',
+        inicioCruzado: 'top',
+        finCruzado: 'bottom',
+        hueco: 88,
+        huecoCruzado: 72,
+        margenCruzado: 64,
+    },
+    vertical: {
+        principal: 'y',
+        inicioPrincipal: 'top',
+        finPrincipal: 'bottom',
+        inicioCruzado: 'left',
+        finCruzado: 'right',
+        hueco: 60,
+        huecoCruzado: 128,
+        margenCruzado: 120,
+    },
+};
+
+const Inicial = dia.Element.define('uml.Inicial', {
+    size: INICIAL,
     attrs: {
-        body: {
-            width: 'calc(w)',
-            height: 'calc(h)',
-            rx: 12,
-            ry: 12,
-            strokeWidth: 1,
-        },
-        punto: { cx: 22, cy: 30, r: 5 },
-        etapa: { x: 36, y: 35, fontSize: 14, fontWeight: 700, fontFamily: 'Nunito, sans-serif' },
-        actual: {
-            x: ANCHO - 16,
-            y: 34,
-            fontSize: 11,
-            fontWeight: 700,
-            fontFamily: 'Nunito, sans-serif',
-            textAnchor: 'end',
-        },
-        accion: { x: 16, y: 62, fontSize: 12, fontFamily: 'Nunito, sans-serif' },
-        actor: { x: 16, y: 90, fontSize: 13, fontWeight: 700, fontFamily: 'Nunito, sans-serif' },
-        rol: { x: 16, y: 112, fontSize: 12, fontWeight: 600, fontFamily: 'Nunito, sans-serif' },
-        fecha: { x: 16, y: 134, fontSize: 11, fontFamily: 'Nunito, sans-serif' },
-        nota: { x: 16, y: 154, fontSize: 11, fontFamily: 'Nunito, sans-serif' },
+        body: { cx: INICIAL.width / 2, cy: INICIAL.height / 2, r: INICIAL.width / 2 - 1 },
     },
 }, {
     markup: [
-        { tagName: 'rect', selector: 'body' },
-        { tagName: 'circle', selector: 'punto' },
-        { tagName: 'text', selector: 'etapa' },
-        { tagName: 'text', selector: 'actual' },
-        { tagName: 'text', selector: 'accion' },
-        { tagName: 'text', selector: 'actor' },
-        { tagName: 'text', selector: 'rol' },
-        { tagName: 'text', selector: 'fecha' },
-        { tagName: 'text', selector: 'nota' },
+        { tagName: 'circle', selector: 'body' },
         { tagName: 'title', selector: 'pista' },
     ],
 });
 
-const namespace = { ...shapes, app: { Paso } };
+const Final = dia.Element.define('uml.Final', {
+    size: FINAL,
+    attrs: {
+        exterior: { cx: FINAL.width / 2, cy: FINAL.height / 2, r: FINAL.width / 2 - 1, fill: 'none', strokeWidth: 2 },
+        interior: { cx: FINAL.width / 2, cy: FINAL.height / 2, r: FINAL.width / 2 - 6 },
+    },
+}, {
+    markup: [
+        { tagName: 'circle', selector: 'exterior' },
+        { tagName: 'circle', selector: 'interior' },
+        { tagName: 'title', selector: 'pista' },
+    ],
+});
+
+const Estado = dia.Element.define('uml.Estado', {
+    size: ESTADO,
+    attrs: {
+        body: { width: 'calc(w)', height: 'calc(h)', rx: 14, ry: 14 },
+        estereotipo: {
+            x: ESTADO.width / 2,
+            y: 16,
+            textAnchor: 'middle',
+            textVerticalAnchor: 'middle',
+            fontSize: 10,
+            fontStyle: 'italic',
+            fontFamily: FUENTE,
+        },
+        nombre: {
+            x: ESTADO.width / 2,
+            textAnchor: 'middle',
+            textVerticalAnchor: 'middle',
+            fontSize: 13,
+            fontWeight: 700,
+            fontFamily: FUENTE,
+        },
+    },
+}, {
+    markup: [
+        { tagName: 'rect', selector: 'body' },
+        { tagName: 'text', selector: 'estereotipo' },
+        { tagName: 'text', selector: 'nombre' },
+        { tagName: 'title', selector: 'pista' },
+    ],
+});
+
+const namespace = { ...shapes, uml: { Inicial, Final, Estado } };
 
 function coloresTema() {
     const oscuro = document.documentElement.getAttribute('data-bs-theme') === 'dark';
 
     return {
         fondo: oscuro ? '#212529' : '#ffffff',
-        borde: oscuro ? '#495057' : '#dee2e6',
+        borde: oscuro ? '#495057' : '#ced4da',
         texto: oscuro ? '#f8f9fa' : '#212529',
         muted: oscuro ? '#adb5bd' : '#6c757d',
-        enlace: oscuro ? '#868e96' : '#94a3b8',
-        solicitante: '#0d6efd',
-        gestor: '#6f42c1',
+        linea: oscuro ? '#ced4da' : '#495057',
+        rechazo: '#dc3545',
     };
 }
 
-function recortar(texto, maximo) {
-    if (!texto) {
-        return '';
+function tamano(id) {
+    if (id === INICIO) {
+        return INICIAL;
     }
 
-    return texto.length > maximo ? `${texto.slice(0, maximo - 1)}…` : texto;
+    return id === FIN ? FINAL : ESTADO;
 }
 
-function textoRol(paso) {
-    if (paso.rol === 'Gestor' && paso.mismoSolicitante) {
-        return 'Gestor · también es el solicitante';
+function acumular(medidas, hueco, inicio) {
+    const inicios = [];
+    let posicion = inicio;
+
+    for (let indice = 0; indice < medidas.length; indice += 1) {
+        inicios[indice] = posicion;
+        posicion += (medidas[indice] ?? 0) + hueco;
     }
 
-    return paso.rol;
+    return { inicios, total: posicion - hueco };
 }
 
-function colorRol(paso, colores) {
-    return paso.rol === 'Gestor' ? colores.gestor : colores.solicitante;
+function calcularDisposicion(ids, orientacion) {
+    const o = ORIENTACIONES[orientacion];
+    const ejes = (medida) => (o.principal === 'x' ? [medida.width, medida.height] : [medida.height, medida.width]);
+    const nodos = ids.map((id, indice) => {
+        const [principal, cruzado] = UBICACION[id] ?? [indice, 2];
+        const [largo, ancho] = ejes(tamano(id));
+
+        return { id, principal, cruzado, largo, ancho };
+    });
+
+    const largos = [];
+    const anchos = [];
+
+    nodos.forEach((nodo) => {
+        largos[nodo.principal] = Math.max(largos[nodo.principal] ?? 0, nodo.largo);
+        anchos[nodo.cruzado] = Math.max(anchos[nodo.cruzado] ?? 0, nodo.ancho);
+    });
+
+    const filasPrincipales = acumular(largos, o.hueco, MARGEN);
+    const filasCruzadas = acumular(anchos, o.huecoCruzado, o.margenCruzado);
+    const ubicaciones = new Map();
+
+    nodos.forEach((nodo) => {
+        const p = filasPrincipales.inicios[nodo.principal] + (largos[nodo.principal] - nodo.largo) / 2;
+        const c = filasCruzadas.inicios[nodo.cruzado] + (anchos[nodo.cruzado] - nodo.ancho) / 2;
+
+        ubicaciones.set(nodo.id, { ...nodo, p, c });
+    });
+
+    const totalPrincipal = filasPrincipales.total + MARGEN;
+    const totalCruzado = filasCruzadas.total + MARGEN;
+
+    return {
+        o,
+        ubicaciones,
+        ancho: o.principal === 'x' ? totalPrincipal : totalCruzado,
+        alto: o.principal === 'x' ? totalCruzado : totalPrincipal,
+    };
 }
 
-export function initDiagramaPasos(contenedor, pasos) {
-    if (!contenedor || !Array.isArray(pasos) || pasos.length === 0) {
+function vector(o, p, c) {
+    return o.principal === 'x' ? { x: p, y: c } : { x: c, y: p };
+}
+
+function desplazar(o, distancia) {
+    return o.principal === 'x' ? { dx: distancia } : { dy: distancia };
+}
+
+function alinear({ x, y }) {
+    return {
+        textAnchor: x < 0 ? 'end' : x > 0 ? 'start' : 'middle',
+        textVerticalAnchor: y < 0 ? 'bottom' : y > 0 ? 'top' : 'middle',
+    };
+}
+
+function geometria(transicion, { o, ubicaciones }) {
+    const origen = ubicaciones.get(transicion.origen);
+    const destino = ubicaciones.get(transicion.destino);
+
+    if (transicion.origen === transicion.destino) {
+        const centro = origen.p + origen.largo / 2;
+
+        return {
+            source: { anchor: { name: o.inicioCruzado, args: desplazar(o, -APERTURA_BUCLE) } },
+            target: { anchor: { name: o.inicioCruzado, args: desplazar(o, APERTURA_BUCLE) } },
+            vertices: [
+                vector(o, centro - APERTURA_BUCLE, origen.c - ALTURA_BUCLE),
+                vector(o, centro + APERTURA_BUCLE, origen.c - ALTURA_BUCLE),
+            ],
+            desfaseEtiqueta: vector(o, 0, -6),
+        };
+    }
+
+    if (origen.cruzado === destino.cruzado) {
+        const avanza = destino.principal > origen.principal;
+
+        return {
+            source: { anchor: { name: avanza ? o.finPrincipal : o.inicioPrincipal } },
+            target: { anchor: { name: avanza ? o.inicioPrincipal : o.finPrincipal } },
+            vertices: [],
+            desfaseEtiqueta: vector(o, 0, -6),
+        };
+    }
+
+    const baja = destino.cruzado > origen.cruzado;
+    const signo = baja ? -1 : 1;
+
+    return {
+        source: { anchor: { name: baja ? o.finCruzado : o.inicioCruzado, args: desplazar(o, signo * SEPARACION_PARALELA) } },
+        target: { anchor: { name: baja ? o.inicioCruzado : o.finCruzado, args: desplazar(o, signo * SEPARACION_PARALELA) } },
+        vertices: [],
+        desfaseEtiqueta: vector(o, signo * 8, 0),
+    };
+}
+
+function crearNodo(id, estado, posicion, alcanzado, colores) {
+    if (id === INICIO) {
+        return new Inicial({
+            position: posicion,
+            attrs: {
+                body: { fill: alcanzado ? colores.texto : colores.borde },
+                pista: { text: 'Estado inicial' },
+            },
+        });
+    }
+
+    if (id === FIN) {
+        const color = alcanzado ? colores.texto : colores.borde;
+
+        return new Final({
+            position: posicion,
+            attrs: {
+                exterior: { stroke: color },
+                interior: { fill: color },
+                pista: { text: 'Estado final' },
+            },
+        });
+    }
+
+    const pista = estado.actual ? 'estado actual' : estado.visitado ? 'visitado' : 'aún no visitado';
+
+    return new Estado({
+        position: posicion,
+        attrs: {
+            body: {
+                fill: estado.visitado || estado.actual ? estado.color : colores.fondo,
+                fillOpacity: estado.visitado || estado.actual ? 0.16 : 1,
+                stroke: estado.visitado || estado.actual ? estado.color : colores.borde,
+                strokeWidth: estado.actual ? 3 : 1.5,
+                strokeDasharray: estado.visitado || estado.actual ? 'none' : '4 3',
+            },
+            estereotipo: { text: estado.actual ? '«actual»' : '', fill: colores.texto },
+            nombre: {
+                text: estado.nombre,
+                y: estado.actual ? 36 : ESTADO.height / 2,
+                fill: estado.visitado || estado.actual ? colores.texto : colores.muted,
+            },
+            pista: { text: `${estado.nombre} (${pista})` },
+        },
+    });
+}
+
+function crearTransicion(transicion, origen, destino, recorrida, disposicion, colores) {
+    const { source, target, vertices, desfaseEtiqueta } = geometria(transicion, disposicion);
+    const color = !recorrida ? colores.borde : transicion.rechazo ? colores.rechazo : colores.linea;
+    const etiqueta = transicion.pasos.length > 0
+        ? `${transicion.eventos.join(', ')} · #${transicion.pasos.join(' #')}`
+        : '';
+
+    return new shapes.standard.Link({
+        source: { id: origen.id, ...source },
+        target: { id: destino.id, ...target },
+        vertices,
+        connector: { name: 'rounded', args: { radius: 10 } },
+        attrs: {
+            line: {
+                stroke: color,
+                strokeWidth: recorrida ? 2 : 1.5,
+                strokeDasharray: recorrida ? 'none' : '5 4',
+                targetMarker: { type: 'path', d: 'M 10 -5 0 0 10 5', fill: 'none', stroke: color, strokeWidth: 1.5 },
+            },
+        },
+        labels: etiqueta === '' ? [] : [{
+            position: { distance: 0.5, offset: desfaseEtiqueta },
+            attrs: {
+                text: {
+                    text: etiqueta,
+                    fill: transicion.rechazo ? colores.rechazo : colores.texto,
+                    fontSize: 11,
+                    fontWeight: 600,
+                    fontFamily: FUENTE,
+                    ...alinear(desfaseEtiqueta),
+                },
+                rect: { fill: colores.fondo, fillOpacity: 0.85 },
+            },
+        }],
+    });
+}
+
+export function initDiagramaEstados(contenedor, datos) {
+    if (!contenedor || !datos || !Array.isArray(datos.estados) || !Array.isArray(datos.transiciones)) {
         return;
     }
 
+    const estados = new Map(datos.estados.map((estado) => [estado.id, estado]));
+    const ids = [INICIO, ...estados.keys(), FIN];
+    const finalAlcanzado = datos.transiciones.some((t) => t.destino === FIN && estados.get(t.origen)?.actual);
     let papel = null;
     let ultimoAncho = 0;
 
     const dibujar = () => {
-        const anchoDisponible = contenedor.clientWidth;
+        const disponible = contenedor.clientWidth;
 
-        if (!anchoDisponible) {
+        if (!disponible) {
             return;
         }
 
         papel?.remove();
         contenedor.replaceChildren();
 
-        const columnas = Math.max(1, Math.floor((anchoDisponible - MARGEN * 2 + SEPARACION_X) / (ANCHO + SEPARACION_X)));
-        const filas = Math.ceil(pasos.length / columnas);
+        const horizontal = calcularDisposicion(ids, 'horizontal');
+        const disposicion = disponible >= horizontal.ancho * ESCALA_MINIMA_HORIZONTAL
+            ? horizontal
+            : calcularDisposicion(ids, 'vertical');
+        const escala = Math.min(1, disponible / disposicion.ancho);
         const colores = coloresTema();
         const grafico = new dia.Graph({}, { cellNamespace: namespace });
-        const elementos = pasos.map((paso, indice) => {
-            const columna = indice % columnas;
-            const fila = Math.floor(indice / columnas);
-            const elemento = new Paso({
-                position: {
-                    x: MARGEN + columna * (ANCHO + SEPARACION_X),
-                    y: MARGEN + fila * (ALTO + SEPARACION_Y),
-                },
-                attrs: {
-                    body: {
-                        fill: colores.fondo,
-                        stroke: paso.actual ? paso.color : colores.borde,
-                        strokeWidth: paso.actual ? 2.5 : 1,
-                    },
-                    punto: { fill: paso.color },
-                    etapa: { text: recortar(paso.etapa, 18), fill: colores.texto },
-                    actual: { text: paso.actual ? 'Actual' : '', fill: paso.color },
-                    accion: { text: recortar(paso.accion, 34), fill: colores.muted },
-                    actor: { text: recortar(paso.actor, 28), fill: colores.texto },
-                    rol: { text: textoRol(paso), fill: colorRol(paso, colores) },
-                    fecha: { text: paso.fecha ?? '', fill: colores.muted },
-                    nota: {
-                        text: recortar(paso.observaciones, 36),
-                        fill: paso.rechazo ? '#dc3545' : colores.muted,
-                    },
-                    pista: {
-                        text: [paso.actor, textoRol(paso), paso.accion, paso.observaciones].filter(Boolean).join('. '),
-                    },
-                },
-            });
+        const nodos = new Map();
 
-            elemento.addTo(grafico);
+        ids.forEach((id) => {
+            const { p, c } = disposicion.ubicaciones.get(id);
+            const alcanzado = id === INICIO ? datos.pasos?.length > 0 : finalAlcanzado;
+            const nodo = crearNodo(id, estados.get(id), vector(disposicion.o, p, c), alcanzado, colores);
 
-            return elemento;
+            nodo.addTo(grafico);
+            nodos.set(id, nodo);
         });
 
-        elementos.slice(0, -1).forEach((origen, indice) => {
-            const destino = elementos[indice + 1];
-            const mismaFila = Math.floor(indice / columnas) === Math.floor((indice + 1) / columnas);
+        datos.transiciones.forEach((transicion) => {
+            const origen = nodos.get(transicion.origen);
+            const destino = nodos.get(transicion.destino);
 
-            new shapes.standard.Link({
-                source: { id: origen.id, anchor: { name: mismaFila ? 'right' : 'bottom' } },
-                target: { id: destino.id, anchor: { name: mismaFila ? 'left' : 'top' } },
-                router: { name: 'manhattan', args: { padding: 14, step: 8 } },
-                connector: { name: 'rounded', args: { radius: 8 } },
-                attrs: {
-                    line: {
-                        stroke: pasos[indice + 1].rechazo ? '#dc3545' : colores.enlace,
-                        strokeWidth: 2,
-                        targetMarker: { type: 'path', d: 'M 8 -4 0 0 8 4 z', fill: pasos[indice + 1].rechazo ? '#dc3545' : colores.enlace },
-                    },
-                },
-            }).addTo(grafico);
+            if (!origen || !destino) {
+                return;
+            }
+
+            const recorrida = transicion.pasos.length > 0 || (transicion.destino === FIN && finalAlcanzado);
+
+            crearTransicion(transicion, origen, destino, recorrida, disposicion, colores).addTo(grafico);
         });
 
         papel = new dia.Paper({
             el: contenedor,
             model: grafico,
-            width: Math.max(anchoDisponible, columnas * (ANCHO + SEPARACION_X) + MARGEN),
-            height: filas * (ALTO + SEPARACION_Y) + MARGEN,
+            width: Math.ceil(disposicion.ancho * escala),
+            height: Math.ceil(disposicion.alto * escala),
             async: false,
             frozen: false,
             interactive: false,
             cellViewNamespace: namespace,
+            defaultConnectionPoint: { name: 'anchor' },
             background: { color: 'transparent' },
         });
+        papel.scale(escala);
 
-        ultimoAncho = anchoDisponible;
+        ultimoAncho = disponible;
     };
 
     dibujar();
