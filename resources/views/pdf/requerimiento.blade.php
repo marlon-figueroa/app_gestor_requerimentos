@@ -6,12 +6,12 @@
     <style>
         @page { margin: 90px 40px 60px 40px; }
         body { font-family: 'DejaVu Sans', sans-serif; font-size: 11px; color: #212529; }
-        header { position: fixed; top: -70px; left: 0; right: 0; height: 60px; border-bottom: 2px solid #0d6efd; }
-        header h1 { margin: 0; font-size: 16px; color: #0d6efd; }
+        header { position: fixed; top: -70px; left: 0; right: 0; height: 60px; border-bottom: 2px solid {{ config('branding.primary') }}; }
+        header h1 { margin: 0; font-size: 16px; color: {{ config('branding.primary') }}; }
         header .meta { font-size: 10px; color: #6c757d; }
         footer { position: fixed; bottom: -40px; left: 0; right: 0; height: 30px; font-size: 9px; color: #6c757d; text-align: right; }
         footer .page:after { content: counter(page); }
-        h2 { font-size: 13px; color: #0d6efd; border-bottom: 1px solid #dee2e6; padding-bottom: 3px; margin: 18px 0 8px; }
+        h2 { font-size: 13px; color: {{ config('branding.primary') }}; border-bottom: 1px solid #dee2e6; padding-bottom: 3px; margin: 18px 0 8px; }
         h3 { font-size: 12px; margin: 0 0 4px; }
         table { width: 100%; border-collapse: collapse; }
         .datos td { padding: 4px 6px; border-bottom: 1px solid #dee2e6; vertical-align: top; }
@@ -27,8 +27,8 @@
         .adjunto-imagen img { max-width: 100%; max-height: 420px; border: 1px solid #dee2e6; }
         .adjunto-imagen .pie { font-size: 10px; color: #6c757d; margin-top: 3px; }
         .lista-pdf td, .historial td, .historial th { padding: 5px 6px; border-bottom: 1px solid #dee2e6; vertical-align: top; }
-        .historial th { background: #0d6efd; color: #fff; text-align: left; }
-        a { color: #0d6efd; }
+        .historial th { background: {{ config('branding.primary') }}; color: #fff; text-align: left; }
+        a { color: {{ config('branding.primary') }}; }
         .nota { font-size: 9px; color: #6c757d; margin-top: 4px; }
         .muted { color: #6c757d; }
     </style>

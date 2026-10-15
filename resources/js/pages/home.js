@@ -11,6 +11,7 @@ if (datosEl && barrasCanvas && pastelCanvas) {
     const botones = [...document.querySelectorAll('#dashboard-requerimientos [data-periodo]')];
 
     const colorTema = (variable) => getComputedStyle(document.documentElement).getPropertyValue(variable).trim();
+    const colorPrimario = () => colorTema('--bs-primary') || document.querySelector('meta[name="brand-primary"]')?.content || '#5f27cd';
 
     const barras = new Chart(barrasCanvas, {
         type: 'bar',
@@ -19,7 +20,7 @@ if (datosEl && barrasCanvas && pastelCanvas) {
             datasets: [{
                 label: 'Requerimientos',
                 data: [],
-                backgroundColor: '#0d6efd',
+                backgroundColor: colorPrimario(),
                 borderRadius: 4,
                 maxBarThickness: 36,
             }],

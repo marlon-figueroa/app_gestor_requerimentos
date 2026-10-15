@@ -48,7 +48,7 @@ enum EstadoRequerimiento: string
             self::EnRevision => '#ffc107',
             self::Rechazado => '#dc3545',
             self::Aprobado => '#0dcaf0',
-            self::EnDesarrollo => '#0d6efd',
+            self::EnDesarrollo => config('branding.primary'),
             self::Finalizado => '#198754',
         };
     }

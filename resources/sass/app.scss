@@ -29,10 +29,12 @@
 // Dropzone
 @import 'dropzone/dist/dropzone.css';
 
-// Tempus Dominus
-@import '@eonasdan/tempus-dominus/dist/css/tempus-dominus.css';
+// Tempus Dominus (SCSS para enlazar $primary)
+$td-active-bg: $primary;
+@import '@eonasdan/tempus-dominus/src/scss/tempus-dominus';
 
 // Estilos propios
 @import 'custom';
 @import 'theme';
+@import 'primary-overrides';
 @import 'loading';

@@ -6,6 +6,7 @@
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="brand-primary" content="{{ config('branding.primary') }}">
 
     <title>@hasSection('title')@yield('title') | @endif{{ config('app.name', 'Laravel') }}</title>
 

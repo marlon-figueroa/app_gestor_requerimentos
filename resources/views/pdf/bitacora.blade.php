@@ -6,15 +6,15 @@
     <style>
         @page { margin: 90px 30px 60px 30px; }
         body { font-family: 'DejaVu Sans', sans-serif; font-size: 9px; color: #212529; }
-        header { position: fixed; top: -70px; left: 0; right: 0; height: 60px; border-bottom: 2px solid #0d6efd; }
-        header h1 { margin: 0; font-size: 16px; color: #0d6efd; }
+        header { position: fixed; top: -70px; left: 0; right: 0; height: 60px; border-bottom: 2px solid {{ config('branding.primary') }}; }
+        header h1 { margin: 0; font-size: 16px; color: {{ config('branding.primary') }}; }
         header .meta { font-size: 9px; color: #6c757d; }
         footer { position: fixed; bottom: -40px; left: 0; right: 0; height: 30px; font-size: 8px; color: #6c757d; text-align: right; }
         footer .page:after { content: counter(page); }
         .filtros { margin-bottom: 8px; }
         .filtros span { display: inline-block; background: #e9ecef; padding: 2px 6px; border-radius: 3px; margin-right: 4px; }
         table { width: 100%; border-collapse: collapse; }
-        th { background: #0d6efd; color: #fff; text-align: left; padding: 5px; }
+        th { background: {{ config('branding.primary') }}; color: #fff; text-align: left; padding: 5px; }
         td { padding: 4px 5px; border-bottom: 1px solid #dee2e6; vertical-align: top; }
         tr:nth-child(even) td { background: #f8f9fa; }
         .ok { color: #198754; font-weight: bold; }

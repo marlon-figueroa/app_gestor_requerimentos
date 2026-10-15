@@ -1,0 +1,36 @@
+// Correcciones finales: librerías compiladas con el azul por defecto de Bootstrap (#0d6efd).
+
+:root,
+[data-bs-theme='light'],
+[data-bs-theme='dark'] {
+    --bs-blue: #{$primary};
+}
+
+// Select2 (tema bootstrap-5 en CSS fijo)
+.select2-container--bootstrap-5 {
+    &.select2-container--focus .select2-selection,
+    &.select2-container--open .select2-selection {
+        border-color: rgba(var(--bs-primary-rgb), 0.65);
+        box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+    }
+
+    .select2-dropdown {
+        border-color: rgba(var(--bs-primary-rgb), 0.65);
+    }
+
+    .select2-dropdown .select2-search .select2-search__field:focus {
+        border-color: rgba(var(--bs-primary-rgb), 0.65);
+        box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+    }
+
+    .select2-dropdown .select2-results__options .select2-results__option.select2-results__option--selected,
+    .select2-dropdown .select2-results__options .select2-results__option[aria-selected='true']:not(.select2-results__option--highlighted) {
+        color: #{$white};
+        background-color: var(--bs-primary);
+    }
+}
+
+// Tempus Dominus (focus embebido en el CSS upstream)
+.tempus-dominus-widget :focus {
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+}

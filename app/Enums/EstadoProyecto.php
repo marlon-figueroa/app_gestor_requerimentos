@@ -32,7 +32,7 @@ enum EstadoProyecto: string
     public function hex(): string
     {
         return match ($this) {
-            self::Activo => '#0d6efd',
+            self::Activo => config('branding.primary'),
             self::Finalizado => '#198754',
             self::Cancelado => '#6c757d',
         };
