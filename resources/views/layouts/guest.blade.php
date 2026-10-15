@@ -33,7 +33,7 @@
     </nav>
 
     <main class="guest-content">
-        <div class="container-fluid">
+        <div class="container-fluid d-flex flex-column flex-grow-1">
             @include('partials.alerts')
 
             @yield('content')
