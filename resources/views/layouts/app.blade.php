@@ -21,7 +21,7 @@
             @include('layouts.partials.topbar')
 
             <main class="app-content">
-                <div class="container-lg">
+                <div class="container">
                     @include('partials.impersonacion')
                     @include('partials.alerts')
 
