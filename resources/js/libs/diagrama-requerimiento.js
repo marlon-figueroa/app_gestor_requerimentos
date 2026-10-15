@@ -336,7 +336,6 @@ export function initDiagramaEstados(contenedor, datos) {
         }
 
         papel?.remove();
-        contenedor.replaceChildren();
 
         const horizontal = calcularDisposicion(ids, 'horizontal');
         const disposicion = disponible >= horizontal.ancho * ESCALA_MINIMA_HORIZONTAL
@@ -370,18 +369,19 @@ export function initDiagramaEstados(contenedor, datos) {
         });
 
         papel = new dia.Paper({
-            el: contenedor,
             model: grafico,
-            width: Math.ceil(disposicion.ancho * escala),
+            width: Math.floor(disposicion.ancho * escala),
             height: Math.ceil(disposicion.alto * escala),
             async: false,
-            frozen: false,
+            frozen: true,
             interactive: false,
             cellViewNamespace: namespace,
             defaultConnectionPoint: { name: 'anchor' },
             background: { color: 'transparent' },
         });
         papel.scale(escala);
+        contenedor.replaceChildren(papel.el);
+        papel.unfreeze();
 
         ultimoAncho = disponible;
     };
