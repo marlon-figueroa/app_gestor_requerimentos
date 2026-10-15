@@ -15,9 +15,16 @@ class FlujoController extends Controller
 
         $datos = $request->validate([
             'observaciones' => ['nullable', 'string', 'max:5000'],
+            'gestor_id' => ['nullable', 'integer', 'exists:users,id'],
         ]);
 
-        $flujo->ejecutar($requerimiento, $accion, $request->user(), $datos['observaciones'] ?? null);
+        $flujo->ejecutar(
+            $requerimiento,
+            $accion,
+            $request->user(),
+            $datos['observaciones'] ?? null,
+            isset($datos['gestor_id']) ? (int) $datos['gestor_id'] : null,
+        );
 
         $mensaje = match ($accion) {
             'enviar' => "{$requerimiento->codigo} se envió a revisión.",
@@ -26,6 +33,8 @@ class FlujoController extends Controller
             'rechazar' => "{$requerimiento->codigo} fue rechazado.",
             'iniciar' => "{$requerimiento->codigo} pasó a desarrollo.",
             'finalizar' => "{$requerimiento->codigo} fue finalizado.",
+            'liberar' => "{$requerimiento->codigo} quedó disponible en la bandeja.",
+            'reasignar' => "{$requerimiento->codigo} fue reasignado.",
         };
 
         if ($request->expectsJson()) {

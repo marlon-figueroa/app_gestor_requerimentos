@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\EstadoProyecto;
 use App\Enums\EstadoRequerimiento;
+use App\Models\User;
 use Database\Factories\ProyectoFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -23,6 +24,7 @@ class Proyecto extends Model
         'nombre',
         'descripcion',
         'responsable_id',
+        'fecha_inicio',
         'fecha_finalizacion',
     ];
 
@@ -34,6 +36,7 @@ class Proyecto extends Model
     {
         return [
             'estado' => EstadoProyecto::class,
+            'fecha_inicio' => 'date',
             'fecha_finalizacion' => 'date',
             'finalizado_at' => 'datetime',
             'cancelado_at' => 'datetime',
@@ -83,6 +86,34 @@ class Proyecto extends Model
     public function evaluacionesPf(): HasMany
     {
         return $this->hasMany(ProyectoEvaluacionPf::class)->orderByDesc('created_at')->orderByDesc('id');
+    }
+
+    public function miembros(): HasMany
+    {
+        return $this->hasMany(ProyectoMiembro::class);
+    }
+
+    public function scopeAccesiblesPara(Builder $query, User $usuario): Builder
+    {
+        if ($usuario->can('proyectos.ver')) {
+            if (config('proyectos.scope_responsable') && ! $usuario->hasRole('Administrador') && $usuario->can('proyectos.crear')) {
+                return $query->where(function (Builder $q) use ($usuario): void {
+                    $q->where('responsable_id', $usuario->id)
+                        ->orWhereHas('miembros', fn (Builder $m) => $m->where('user_id', $usuario->id));
+                });
+            }
+
+            return $query;
+        }
+
+        if ($usuario->can('proyectos.ver_limitado')) {
+            return $query->where(function (Builder $q) use ($usuario): void {
+                $q->whereHas('requerimientos', fn (Builder $r) => $r->where('solicitante_id', $usuario->id))
+                    ->orWhereHas('miembros', fn (Builder $m) => $m->where('user_id', $usuario->id));
+            });
+        }
+
+        return $query->whereRaw('0 = 1');
     }
 
     /**

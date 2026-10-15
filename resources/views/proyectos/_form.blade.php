@@ -11,8 +11,20 @@
 <x-form.select name="responsable_id" label="Responsable de ejecución" :options="$responsables" :selected="$proyecto->responsable_id"
                placeholder="Seleccione un gestor" required help="Solo usuarios con rol Gestor." />
 
+<x-form.input name="fecha_inicio" label="Fecha de inicio" type="date" :value="$proyecto->fecha_inicio"
+              help="Opcional; referencia de planificación." />
+
 <x-form.input name="fecha_finalizacion" label="Fecha de finalización" type="date" :value="$proyecto->fecha_finalizacion" required
               help="Fecha comprometida para cerrar el proyecto." />
+
+@if (! empty($colaboradores))
+    @php
+        $miembrosSeleccionados = old('miembros', $proyecto->exists ? $proyecto->miembros->pluck('user_id')->all() : []);
+    @endphp
+    <x-form.select name="miembros[]" label="Equipo del proyecto" :options="$colaboradores" :selected="$miembrosSeleccionados"
+                   multiple allow-clear col="col-12"
+                   help="Colaboradores adicionales (opcional). El responsable no debe repetirse aquí." />
+@endif
 
 <div class="col-12 position-relative">
     <label id="adjuntos-label" class="form-label">Documentos adjuntos</label>

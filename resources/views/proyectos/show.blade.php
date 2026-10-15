@@ -63,22 +63,34 @@
             </div>
 
             <div class="card mb-4" id="requerimientos">
-                <div class="card-header d-flex align-items-center justify-content-between">
+                <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
                     <span>
                         <i class="bi bi-clipboard-check me-1"></i> Requerimientos del proyecto ({{ $proyecto->requerimientos->count() }})
                     </span>
+                    <div class="d-flex align-items-center gap-2">
+                        @can('create', \App\Models\Requerimiento::class)
+                            @if ($proyecto->estado === \App\Enums\EstadoProyecto::Activo)
+                                <a href="{{ route('requerimientos.create', ['proyecto_id' => $proyecto->id]) }}" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-plus-lg"></i> Nuevo requerimiento
+                                </a>
+                            @endif
+                        @endcan
                     @if ($proyecto->requerimientos->isNotEmpty())
                         <span @class(['badge', 'text-bg-warning' => $pendientes > 0, 'text-bg-success' => $pendientes === 0])>
                             {{ $pendientes > 0 ? $pendientes.' sin finalizar' : 'Todos finalizados' }}
                         </span>
                     @endif
+                    </div>
                 </div>
                 <div class="card-body">
                     @if ($proyecto->requerimientos->isEmpty())
                         <p class="text-body-secondary mb-0">
-                            Aún no hay requerimientos en este proyecto. Se asocian al crear o editar un requerimiento.
+                            Aún no hay requerimientos en este proyecto. Use el botón «Nuevo requerimiento» para crear uno.
                         </p>
                     @else
+                        @if ($requerimientosOcultos > 0)
+                            <p class="small text-body-secondary">{{ $requerimientosOcultos }} requerimiento(s) no se muestran por permisos de confidencialidad.</p>
+                        @endif
                         <div class="table-responsive">
                             <table class="table table-sm align-middle small mb-0">
                                 <thead>
@@ -92,14 +104,10 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($proyecto->requerimientos as $requerimiento)
+                                    @foreach ($requerimientosVisibles as $requerimiento)
                                         <tr>
                                             <td class="text-nowrap">
-                                                @can('view', $requerimiento)
-                                                    @include('requerimientos.partials.codigo')
-                                                @else
-                                                    {{ $requerimiento->codigo }}
-                                                @endcan
+                                                @include('requerimientos.partials.codigo')
                                             </td>
                                             <td>{{ $requerimiento->titulo }}</td>
                                             <td>{{ $requerimiento->solicitante?->name }}</td>

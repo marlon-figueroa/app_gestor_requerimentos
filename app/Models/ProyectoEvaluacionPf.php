@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\EstadoEvaluacionPf;
+use App\Enums\ViabilidadPf;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -20,6 +22,16 @@ class ProyectoEvaluacionPf extends Model
         'factor_ajuste',
         'total_ajustado',
         'caracteristicas',
+        'estado_evaluacion',
+        'es_baseline',
+        'viabilidad_diagnostico',
+        'puntaje_diagnostico',
+        'diagnostico_snapshot',
+    ];
+
+    protected $attributes = [
+        'estado_evaluacion' => 'borrador',
+        'es_baseline' => false,
     ];
 
     protected function casts(): array
@@ -28,6 +40,10 @@ class ProyectoEvaluacionPf extends Model
             'caracteristicas' => 'array',
             'factor_ajuste' => 'decimal:2',
             'total_ajustado' => 'decimal:2',
+            'estado_evaluacion' => EstadoEvaluacionPf::class,
+            'es_baseline' => 'boolean',
+            'viabilidad_diagnostico' => ViabilidadPf::class,
+            'diagnostico_snapshot' => 'array',
         ];
     }
 

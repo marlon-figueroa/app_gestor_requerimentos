@@ -12,6 +12,44 @@
 
     <p class="lead">Bienvenido(a), <strong>{{ Auth::user()->name }}</strong>.</p>
 
+    @if ($kpisProyectos)
+        <div class="row g-4 mb-2">
+            <div class="col-md-4">
+                <div class="card stat-card h-100">
+                    <div class="card-body">
+                        <div class="text-muted text-uppercase small">Proyectos activos</div>
+                        <div class="display-6 fw-bold">{{ $kpisProyectos['activos'] }}</div>
+                    </div>
+                    @can('viewAny', \App\Models\Proyecto::class)
+                        <div class="card-footer border-0">
+                            <a href="{{ auth()->user()->can('proyectos.ver') ? route('proyectos.index') : route('proyectos.mis-proyectos') }}" class="small text-decoration-none">
+                                Ver portafolio <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    @endcan
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card stat-card h-100 border-warning">
+                    <div class="card-body">
+                        <div class="text-muted text-uppercase small">Proyectos vencidos</div>
+                        <div class="display-6 fw-bold text-warning">{{ $kpisProyectos['vencidos'] }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card stat-card h-100">
+                    <div class="card-body">
+                        <div class="text-muted text-uppercase small">Avance promedio (req.)</div>
+                        <div class="display-6 fw-bold">
+                            {{ $kpisProyectos['avance_promedio'] !== null ? $kpisProyectos['avance_promedio'].'%' : '—' }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <div class="row g-4">
         @foreach ($stats as $stat)
             <div class="col-md-4">

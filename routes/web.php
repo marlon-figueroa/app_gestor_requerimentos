@@ -5,11 +5,13 @@ use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\NotificacionController;
 use App\Http\Controllers\Proyectos\AdjuntoController as ProyectoAdjuntoController;
 use App\Http\Controllers\Proyectos\EvaluacionPfController;
 use App\Http\Controllers\Proyectos\FlujoController as ProyectoFlujoController;
 use App\Http\Controllers\Proyectos\ProyectoController;
 use App\Http\Controllers\Requerimientos\AdjuntoController;
+use App\Http\Controllers\Requerimientos\ComentarioController;
 use App\Http\Controllers\Requerimientos\CalendarioController;
 use App\Http\Controllers\Requerimientos\CasoUsoController;
 use App\Http\Controllers\Requerimientos\FlujoController;
@@ -27,6 +29,10 @@ Auth::routes();
 
 Route::middleware('auth')->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
+
+    Route::get('notificaciones', [NotificacionController::class, 'index'])->name('notificaciones.index');
+    Route::post('notificaciones/{id}/leida', [NotificacionController::class, 'marcarLeida'])->name('notificaciones.leida');
+    Route::post('notificaciones/leidas', [NotificacionController::class, 'marcarTodasLeidas'])->name('notificaciones.leidas');
 
     // POST para que el cambio de sesión exija el token CSRF.
     Route::post('impersonate/take/{id}', [ImpersonateController::class, 'take'])
@@ -64,6 +70,7 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::prefix('proyectos')->name('proyectos.')->group(function () {
+        Route::get('mis-proyectos', [ProyectoController::class, 'misProyectos'])->name('mis-proyectos');
         Route::post('data', [ProyectoController::class, 'data'])->name('data');
         Route::get('{proyecto}/pdf', [ProyectoController::class, 'pdf'])->name('pdf');
         Route::post('{proyecto}/flujo/{accion}', ProyectoFlujoController::class)
@@ -85,6 +92,8 @@ Route::middleware('auth')->group(function () {
         Route::put('{proyecto}/evaluaciones-pf/{evaluacion_pf}', [EvaluacionPfController::class, 'update'])->name('evaluaciones-pf.update');
         Route::delete('{proyecto}/evaluaciones-pf/{evaluacion_pf}', [EvaluacionPfController::class, 'destroy'])->name('evaluaciones-pf.destroy');
         Route::get('{proyecto}/evaluaciones-pf/{evaluacion_pf}/pdf', [EvaluacionPfController::class, 'pdf'])->name('evaluaciones-pf.pdf');
+        Route::post('{proyecto}/evaluaciones-pf/{evaluacion_pf}/duplicate', [EvaluacionPfController::class, 'duplicate'])->name('evaluaciones-pf.duplicate');
+        Route::post('{proyecto}/evaluaciones-pf/{evaluacion_pf}/baseline', [EvaluacionPfController::class, 'baseline'])->name('evaluaciones-pf.baseline');
     });
 
     Route::resource('proyectos', ProyectoController::class)->except('destroy');
@@ -95,6 +104,9 @@ Route::middleware('auth')->group(function () {
         Route::get('kanban', [KanbanController::class, 'index'])->name('kanban');
         Route::get('calendario', [CalendarioController::class, 'index'])->name('calendario');
         Route::get('calendario/eventos', [CalendarioController::class, 'eventos'])->name('calendario.eventos');
+        Route::get('export.csv', [RequerimientoController::class, 'exportCsv'])->name('export.csv');
+
+        Route::post('{requerimiento}/comentarios', [ComentarioController::class, 'store'])->name('comentarios.store');
 
         Route::get('{requerimiento}/pdf', [RequerimientoController::class, 'pdf'])->name('pdf');
         Route::post('{requerimiento}/flujo/{accion}', FlujoController::class)

@@ -29,7 +29,9 @@
                              :confirm="'¿Eliminar el requerimiento '.$requerimiento->codigo.'?'"
                              :redirect="route('requerimientos.index')" />
         @endcan
-        @include('requerimientos.partials.botones-flujo')
+        @include('requerimientos.partials.botones-flujo', [
+            'gestores' => \App\Http\Requests\Proyectos\ProyectoRequest::responsables()->pluck('name', 'id'),
+        ])
     </x-page-header>
 
     @php
@@ -77,6 +79,33 @@
                             Aún no se han identificado casos de uso. Cada caso de uso describe una parte o pantalla con su funcionalidad.
                         </p>
                     @endforelse
+                </div>
+            </div>
+
+            <div class="card mb-4" id="comentarios">
+                <div class="card-header"><i class="bi bi-chat-left-text me-1"></i> Comentarios ({{ $requerimiento->comentarios->count() }})</div>
+                <div class="card-body">
+                    @forelse ($requerimiento->comentarios as $comentario)
+                        <div @class(['mb-3 pb-3', 'border-bottom' => ! $loop->last])>
+                            <div class="small text-body-secondary">
+                                <strong>{{ $comentario->usuario?->name }}</strong>
+                                · {{ $comentario->created_at?->format('d/m/Y H:i') }}
+                            </div>
+                            <div class="mt-1">{!! nl2br(e($comentario->cuerpo)) !!}</div>
+                        </div>
+                    @empty
+                        <p class="text-body-secondary mb-3">Sin comentarios aún.</p>
+                    @endforelse
+
+                    @can('view', $requerimiento)
+                        <form method="POST" action="{{ route('requerimientos.comentarios.store', $requerimiento) }}" class="mt-2">
+                            @csrf
+                            <label for="cuerpo-comentario" class="form-label">Agregar comentario</label>
+                            <textarea id="cuerpo-comentario" name="cuerpo" class="form-control @error('cuerpo') is-invalid @enderror" rows="3" required maxlength="5000">{{ old('cuerpo') }}</textarea>
+                            @error('cuerpo')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            <button type="submit" class="btn btn-sm btn-primary mt-2">Publicar</button>
+                        </form>
+                    @endcan
                 </div>
             </div>
 
@@ -141,6 +170,8 @@
                     <dl class="row small mb-0">
                         <dt class="col-5">Estado</dt>
                         <dd class="col-7">@include('requerimientos.partials.estado', ['estado' => $requerimiento->estado])</dd>
+                        <dt class="col-5">Prioridad</dt>
+                        <dd class="col-7">@include('requerimientos.partials.prioridad', ['prioridad' => $requerimiento->prioridad])</dd>
                         <dt class="col-5">Proyecto</dt>
                         <dd class="col-7">
                             @if ($requerimiento->proyecto)

@@ -141,6 +141,7 @@ class ProyectoPuntosFuncionService
                     'descripcion' => $fila['descripcion'] ?? null,
                     'det' => (int) $fila['det'],
                     'referencias' => (int) $fila['referencias'],
+                    'requerimiento_id' => filled($fila['requerimiento_id'] ?? null) ? (int) $fila['requerimiento_id'] : null,
                     'complejidad' => $resultado['complejidad']->value,
                     'puntos' => $resultado['puntos'],
                     'orden' => $orden++,

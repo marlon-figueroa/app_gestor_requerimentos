@@ -29,6 +29,7 @@ class EvaluacionPfRequest extends FormRequest
             'componentes.*.descripcion' => ['nullable', 'string', 'max:2000'],
             'componentes.*.det' => ['required', 'integer', 'min:0', 'max:999'],
             'componentes.*.referencias' => ['required', 'integer', 'min:0', 'max:999'],
+            'componentes.*.requerimiento_id' => ['nullable', 'integer', 'exists:requerimientos,id'],
         ];
     }
 
@@ -69,6 +70,7 @@ class EvaluacionPfRequest extends FormRequest
                 'descripcion' => $fila['descripcion'] ?? null,
                 'det' => (int) $fila['det'],
                 'referencias' => (int) $fila['referencias'],
+                'requerimiento_id' => filled($fila['requerimiento_id'] ?? null) ? (int) $fila['requerimiento_id'] : null,
             ])
             ->all();
     }

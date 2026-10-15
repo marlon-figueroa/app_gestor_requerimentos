@@ -45,9 +45,18 @@
                                     </td>
                                     <td class="text-end">{{ $evaluacion->total_sin_ajuste }}</td>
                                     <td class="text-end">{{ number_format($evaluacion->total_ajustado, 2, ',', '.') }}</td>
-                                    @php $d = $diagnosticos[$evaluacion->id]; @endphp
+                                    @php
+                                        $d = $diagnosticos[$evaluacion->id];
+                                        $viabilidadFila = $d['viabilidad'];
+                                        $viabilidadFila = $viabilidadFila instanceof \App\Enums\ViabilidadPf
+                                            ? $viabilidadFila
+                                            : \App\Enums\ViabilidadPf::from($viabilidadFila);
+                                    @endphp
                                     <td>
-                                        <x-viabilidad-pf-badge :viabilidad="$d['viabilidad']" :short="true" />
+                                        <x-viabilidad-pf-badge :viabilidad="$viabilidadFila" :short="true" />
+                                        @if ($evaluacion->es_baseline)
+                                            <span class="badge text-bg-success ms-1">Baseline</span>
+                                        @endif
                                     </td>
                                     <td class="text-end small">{{ $d['tiempo']['dias_laborables'] }} días lab.</td>
                                     <td>{{ $evaluacion->creador?->name ?? '—' }}</td>

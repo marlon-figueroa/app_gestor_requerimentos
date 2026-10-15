@@ -19,7 +19,7 @@ class RolesAndPermissionsSeeder extends Seeder
         'bitacora' => ['ver', 'exportar', 'invalidar_sesion'],
         'monitoreo' => ['pulse', 'logs'],
         'requerimientos' => ['ver', 'crear', 'editar', 'eliminar', 'exportar', 'revisar'],
-        'proyectos' => ['ver', 'crear', 'editar', 'cerrar', 'exportar', 'evaluar'],
+        'proyectos' => ['ver', 'ver_limitado', 'crear', 'editar', 'cerrar', 'exportar', 'evaluar'],
     ];
 
     public function run(): void
@@ -48,6 +48,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'requerimientos.editar',
             'requerimientos.eliminar',
             'requerimientos.exportar',
+            'proyectos.ver_limitado',
         ]);
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();

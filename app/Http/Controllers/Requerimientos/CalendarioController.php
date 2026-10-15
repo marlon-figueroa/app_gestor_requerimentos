@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Requerimientos;
 
 use App\Enums\EstadoRequerimiento;
 use App\Http\Controllers\Controller;
+use App\Models\Proyecto;
 use App\Models\Requerimiento;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -13,12 +14,16 @@ use Throwable;
 
 class CalendarioController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $this->authorize('viewAny', Requerimiento::class);
 
         return view('requerimientos.calendario', [
             'estados' => EstadoRequerimiento::cases(),
+            'proyectos' => Proyecto::query()->orderByDesc('id')->get(['id', 'codigo', 'nombre'])
+                ->mapWithKeys(fn (Proyecto $p) => [$p->id => "{$p->codigo} · {$p->nombre}"])
+                ->all(),
+            'proyectoId' => $request->integer('proyecto_id') ?: null,
         ]);
     }
 
@@ -40,6 +45,7 @@ class CalendarioController extends Controller
                 EstadoRequerimiento::tryFrom((string) $request->input('estado')),
                 fn (Builder $q, EstadoRequerimiento $estado) => $q->where('estado', $estado),
             )
+            ->when($request->filled('proyecto_id'), fn (Builder $q) => $q->where('proyecto_id', (int) $request->input('proyecto_id')))
             ->orderBy('fecha_vencimiento')
             ->get()
             ->map(fn (Requerimiento $r) => [

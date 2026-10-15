@@ -19,7 +19,24 @@
             <a href="{{ route('proyectos.evaluaciones-pf.edit', [$proyecto, $evaluacion]) }}" class="btn btn-outline-primary">
                 <i class="bi bi-pencil-square"></i> Editar
             </a>
+            <form method="POST" action="{{ route('proyectos.evaluaciones-pf.baseline', [$proyecto, $evaluacion]) }}" class="d-inline">
+                @csrf
+                <button type="submit" class="btn btn-outline-success">
+                    <i class="bi bi-bookmark-check"></i> Marcar baseline
+                </button>
+            </form>
         @endcan
+        @can('create', [\App\Models\ProyectoEvaluacionPf::class, $proyecto])
+            <form method="POST" action="{{ route('proyectos.evaluaciones-pf.duplicate', [$proyecto, $evaluacion]) }}" class="d-inline">
+                @csrf
+                <button type="submit" class="btn btn-outline-secondary">
+                    <i class="bi bi-copy"></i> Duplicar
+                </button>
+            </form>
+        @endcan
+        @if ($evaluacion->es_baseline)
+            <span class="badge text-bg-success align-self-center">Baseline</span>
+        @endif
         @can('delete', $evaluacion)
             <x-delete-button :url="route('proyectos.evaluaciones-pf.destroy', [$proyecto, $evaluacion])" label="Eliminar"
                              confirm="¿Eliminar esta evaluación por puntos de función?" class="btn btn-outline-danger" />

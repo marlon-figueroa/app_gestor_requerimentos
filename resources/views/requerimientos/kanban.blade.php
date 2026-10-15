@@ -16,6 +16,19 @@
         @endcan
     </x-page-header>
 
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" action="{{ route('requerimientos.kanban') }}" class="row g-3 align-items-end">
+                <x-form.select name="proyecto_id" label="Proyecto" :options="$proyectos" :selected="$proyectoId" placeholder="Todos" allow-clear col="col-md-4" />
+                <x-form.select name="prioridad" label="Prioridad" :options="$prioridades" :selected="$prioridad" placeholder="Todas" allow-clear col="col-md-3" />
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary flex-fill"><i class="bi bi-search"></i></button>
+                    <a href="{{ route('requerimientos.kanban') }}" class="btn btn-outline-secondary flex-fill"><i class="bi bi-x-circle"></i></a>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="kanban" id="kanban"
          data-url-flujo="{{ route('requerimientos.flujo', ['requerimiento' => '__ID__', 'accion' => '__ACCION__']) }}"
          data-transiciones="{{ json_encode($transiciones) }}">

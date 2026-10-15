@@ -9,6 +9,9 @@
 
 <x-form.input name="titulo" label="Título" :value="$requerimiento->titulo" required autofocus maxlength="255" col="col-12" />
 
+<x-form.select name="prioridad" label="Prioridad" :options="$prioridades ?? []"
+               :selected="$requerimiento->prioridad?->value ?? 'media'" col="col-md-4" />
+
 <x-form.textarea name="descripcion" label="Descripción" :value="$requerimiento->descripcion" rows="6" required
                  help="Describa la necesidad, el problema que resuelve y el resultado esperado." />
 

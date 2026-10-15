@@ -9,7 +9,7 @@ import interactionPlugin from '@fullcalendar/interaction';
  * Calendario de vencimientos. Los eventos se piden al servidor por rango visible
  * y opcionalmente por estado (select externo).
  */
-export function initCalendario(el, { filtroEstado } = {}) {
+export function initCalendario(el, { filtroEstado, filtroProyecto } = {}) {
     if (!el) {
         return null;
     }
@@ -32,6 +32,7 @@ export function initCalendario(el, { filtroEstado } = {}) {
                         start: info.startStr,
                         end: info.endStr,
                         estado: filtroEstado?.value || undefined,
+                        proyecto_id: filtroProyecto?.value || undefined,
                     },
                 })
                 .then(({ data }) => success(data))
@@ -55,6 +56,7 @@ export function initCalendario(el, { filtroEstado } = {}) {
     calendar.render();
 
     filtroEstado?.addEventListener('change', () => calendar.refetchEvents());
+    filtroProyecto?.addEventListener('change', () => calendar.refetchEvents());
 
     return calendar;
 }

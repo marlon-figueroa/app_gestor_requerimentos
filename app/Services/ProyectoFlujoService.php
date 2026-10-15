@@ -4,8 +4,10 @@ namespace App\Services;
 
 use App\Enums\EstadoProyecto;
 use App\Exceptions\TransicionInvalidaException;
+use App\Enums\ViabilidadPf;
 use App\Models\Proyecto;
 use App\Models\User;
+use App\Services\ProyectoEvaluacionSnapshotService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -112,6 +114,28 @@ class ProyectoFlujoService
 
             if ($pendientes > 0) {
                 throw new TransicionInvalidaException(self::mensajePendientes($pendientes));
+            }
+
+            $config = config('proyectos.cierre');
+
+            if ($config['exigir_evaluacion_baseline'] ?? false) {
+                $baseline = ProyectoEvaluacionSnapshotService::evaluacionVigente(
+                    $proyecto->load('evaluacionesPf'),
+                );
+
+                if ($baseline === null || ! $baseline->es_baseline) {
+                    throw new TransicionInvalidaException('Debe existir una evaluación PF marcada como baseline antes de finalizar el proyecto.');
+                }
+            }
+
+            if ($config['bloquear_si_no_viable'] ?? false) {
+                $evaluacion = ProyectoEvaluacionSnapshotService::evaluacionVigente(
+                    $proyecto->load('evaluacionesPf'),
+                );
+
+                if ($evaluacion?->viabilidad_diagnostico === ViabilidadPf::NoViable->value) {
+                    throw new TransicionInvalidaException('No se puede finalizar: la evaluación vigente indica viabilidad no viable.');
+                }
             }
         }
     }

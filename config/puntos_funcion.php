@@ -15,6 +15,11 @@ return [
         'horas_por_pf' => (float) env('PF_HORAS_POR_PF', 8),
         'horas_jornada' => (float) env('PF_HORAS_JORNADA', 8),
         'dias_semana' => 5,
+        'recursos' => max(1, (int) env('PF_RECURSOS', 1)),
+    ],
+
+    'costos' => [
+        'tarifa_hora' => (float) env('PF_TARIFA_HORA', 0),
     ],
 
     /*

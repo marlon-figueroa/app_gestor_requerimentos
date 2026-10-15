@@ -6,6 +6,8 @@
         'rechazar' => ['danger', 'x-circle'],
         'iniciar' => ['primary', 'play-circle'],
         'finalizar' => ['success', 'flag'],
+        'liberar' => ['outline-secondary', 'box-arrow-left'],
+        'reasignar' => ['outline-warning', 'person-lines-fill'],
     ];
     $confirmaciones = [
         'enviar' => 'Mientras esté en revisión no podrá modificarlo.',
@@ -15,9 +17,11 @@
     ];
 @endphp
 
+@php($gestoresJson = isset($gestores) ? json_encode($gestores) : '{}')
 @foreach ($acciones as $accion)
-    @php([$color, $icono] = $estilos[$accion])
+    @php([$color, $icono] = $estilos[$accion] ?? ['secondary', 'arrow-right'])
     <form method="POST" action="{{ route('requerimientos.flujo', [$requerimiento, $accion]) }}" class="d-inline"
+          @if ($accion === 'reasignar') data-reasignar-gestor data-gestores="{{ e($gestoresJson) }}" data-observaciones-titulo="Reasignar {{ $requerimiento->codigo }}" @endif
           @if (in_array($accion, ['aprobar', 'rechazar'], true))
               data-observaciones="{{ $accion === 'rechazar' ? 'requerida' : 'opcional' }}"
               data-observaciones-titulo="{{ \App\Services\RequerimientoFlujoService::ETIQUETAS[$accion] }} {{ $requerimiento->codigo }}"

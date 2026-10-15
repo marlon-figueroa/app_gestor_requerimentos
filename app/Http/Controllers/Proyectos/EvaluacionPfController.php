@@ -8,6 +8,7 @@ use App\Http\Requests\Proyectos\EvaluacionPfRequest;
 use App\Models\Proyecto;
 use App\Models\ProyectoEvaluacionPf;
 use App\Services\ProyectoEvaluacionDiagnosticoService;
+use App\Services\ProyectoEvaluacionSnapshotService;
 use App\Services\ProyectoPuntosFuncionService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
@@ -30,7 +31,8 @@ class EvaluacionPfController extends Controller
         $evaluaciones = $proyecto->evaluacionesPf()->with('creador')->get();
         $diagnosticos = $evaluaciones->mapWithKeys(
             fn (ProyectoEvaluacionPf $evaluacion) => [
-                $evaluacion->id => $diagnosticoService->diagnosticar($proyecto, $evaluacion),
+                $evaluacion->id => $evaluacion->diagnostico_snapshot
+                    ?? $diagnosticoService->diagnosticar($proyecto, $evaluacion),
             ],
         );
 
@@ -51,10 +53,16 @@ class EvaluacionPfController extends Controller
             'evaluacion' => $evaluacion,
             'definicionPf' => $servicio->definicionCliente(),
             'tipos' => TipoComponentePf::cases(),
+            'requerimientosProyecto' => $proyecto->requerimientos()->orderBy('id')->get(['id', 'codigo', 'titulo']),
         ]);
     }
 
-    public function store(EvaluacionPfRequest $request, Proyecto $proyecto, ProyectoPuntosFuncionService $servicio): RedirectResponse
+    public function store(
+        EvaluacionPfRequest $request,
+        Proyecto $proyecto,
+        ProyectoPuntosFuncionService $servicio,
+        ProyectoEvaluacionSnapshotService $snapshot,
+    ): RedirectResponse
     {
         $this->authorize('create', [ProyectoEvaluacionPf::class, $proyecto]);
 
@@ -67,6 +75,7 @@ class EvaluacionPfController extends Controller
             $request->caracteristicas(),
             $request->datosEvaluacion(),
         );
+        $snapshot->persistirDiagnostico($proyecto, $evaluacion);
 
         return redirect()
             ->route('proyectos.evaluaciones-pf.show', [$proyecto, $evaluacion])
@@ -85,7 +94,8 @@ class EvaluacionPfController extends Controller
         $evaluacion_pf->load(['componentes', 'creador', 'proyecto']);
         $proyecto->load('requerimientos');
         $resumen = $servicio->resumenPorTipo($evaluacion_pf);
-        $diagnostico = $diagnosticoService->diagnosticar($proyecto, $evaluacion_pf);
+        $diagnostico = $evaluacion_pf->diagnostico_snapshot
+            ?? $diagnosticoService->diagnosticar($proyecto, $evaluacion_pf);
         $evaluacion = $evaluacion_pf;
 
         return view('proyectos.evaluaciones-pf.show', compact('proyecto', 'evaluacion', 'resumen', 'diagnostico'));
@@ -104,10 +114,17 @@ class EvaluacionPfController extends Controller
             'evaluacion' => $evaluacion,
             'definicionPf' => $servicio->definicionCliente(),
             'tipos' => TipoComponentePf::cases(),
+            'requerimientosProyecto' => $proyecto->requerimientos()->orderBy('id')->get(['id', 'codigo', 'titulo']),
         ]);
     }
 
-    public function update(EvaluacionPfRequest $request, Proyecto $proyecto, ProyectoEvaluacionPf $evaluacion_pf, ProyectoPuntosFuncionService $servicio): RedirectResponse
+    public function update(
+        EvaluacionPfRequest $request,
+        Proyecto $proyecto,
+        ProyectoEvaluacionPf $evaluacion_pf,
+        ProyectoPuntosFuncionService $servicio,
+        ProyectoEvaluacionSnapshotService $snapshot,
+    ): RedirectResponse
     {
         $this->asegurarEvaluacionDelProyecto($proyecto, $evaluacion_pf);
         $this->authorize('update', $evaluacion_pf);
@@ -118,10 +135,44 @@ class EvaluacionPfController extends Controller
             $request->caracteristicas(),
             $request->datosEvaluacion(),
         );
+        $snapshot->persistirDiagnostico($proyecto, $evaluacion_pf);
 
         return redirect()
             ->route('proyectos.evaluaciones-pf.show', [$proyecto, $evaluacion_pf])
             ->with('success', 'Evaluación actualizada.');
+    }
+
+    public function duplicate(
+        Request $request,
+        Proyecto $proyecto,
+        ProyectoEvaluacionPf $evaluacion_pf,
+        ProyectoEvaluacionSnapshotService $snapshot,
+    ): RedirectResponse {
+        $this->asegurarEvaluacionDelProyecto($proyecto, $evaluacion_pf);
+        $this->authorize('view', $evaluacion_pf);
+        $this->authorize('create', [ProyectoEvaluacionPf::class, $proyecto]);
+
+        $copia = $snapshot->duplicar($evaluacion_pf, $request->user()->id);
+        $snapshot->persistirDiagnostico($proyecto, $copia);
+
+        return redirect()
+            ->route('proyectos.evaluaciones-pf.edit', [$proyecto, $copia])
+            ->with('success', 'Evaluación duplicada como borrador.');
+    }
+
+    public function baseline(
+        Proyecto $proyecto,
+        ProyectoEvaluacionPf $evaluacion_pf,
+        ProyectoEvaluacionSnapshotService $snapshot,
+    ): RedirectResponse {
+        $this->asegurarEvaluacionDelProyecto($proyecto, $evaluacion_pf);
+        $this->authorize('update', $evaluacion_pf);
+
+        $snapshot->marcarBaseline($proyecto, $evaluacion_pf);
+
+        return redirect()
+            ->route('proyectos.evaluaciones-pf.show', [$proyecto, $evaluacion_pf])
+            ->with('success', 'Evaluación marcada como baseline aprobada.');
     }
 
     public function destroy(Request $request, Proyecto $proyecto, ProyectoEvaluacionPf $evaluacion_pf): RedirectResponse

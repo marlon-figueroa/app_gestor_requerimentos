@@ -47,6 +47,36 @@ export function initFormulariosFlujo() {
             return;
         }
 
+        if (form.dataset.reasignarGestor !== undefined) {
+            event.preventDefault();
+            const gestores = JSON.parse(form.dataset.gestores || '[]');
+            const { value: gestorId, isConfirmed } = await Swal.fire({
+                title: form.dataset.observacionesTitulo || 'Reasignar gestor',
+                input: 'select',
+                inputOptions: gestores,
+                inputPlaceholder: 'Seleccione un gestor',
+                showCancelButton: true,
+                confirmButtonText: 'Reasignar',
+                cancelButtonText: 'Cancelar',
+                inputValidator: (v) => (!v ? 'Seleccione un gestor' : undefined),
+            });
+            if (! isConfirmed) {
+                return;
+            }
+            let input = form.querySelector('input[name="gestor_id"]');
+            if (! input) {
+                input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'gestor_id';
+                form.appendChild(input);
+            }
+            input.value = gestorId;
+            form.dataset.enviado = '1';
+            form.submit();
+
+            return;
+        }
+
         if (!form.dataset.observaciones) {
             return;
         }

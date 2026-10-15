@@ -21,6 +21,7 @@ class ProyectoEvaluacionComponentePf extends Model
         'complejidad',
         'puntos',
         'orden',
+        'requerimiento_id',
     ];
 
     protected function casts(): array
@@ -34,5 +35,10 @@ class ProyectoEvaluacionComponentePf extends Model
     public function evaluacion(): BelongsTo
     {
         return $this->belongsTo(ProyectoEvaluacionPf::class, 'evaluacion_id');
+    }
+
+    public function requerimiento(): BelongsTo
+    {
+        return $this->belongsTo(Requerimiento::class);
     }
 }

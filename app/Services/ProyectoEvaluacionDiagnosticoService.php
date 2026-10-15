@@ -32,10 +32,13 @@ class ProyectoEvaluacionDiagnosticoService
         $umbrales = $config['viabilidad'];
 
         $pfAjustados = (float) $evaluacion->total_ajustado;
+        $recursos = max(1, (int) ($prod['recursos'] ?? 1));
         $horas = round($pfAjustados * $prod['horas_por_pf'], 1);
-        $diasLaborables = (int) max(1, (int) ceil($horas / max($prod['horas_jornada'], 1)));
+        $diasLaborables = (int) max(1, (int) ceil($horas / (max($prod['horas_jornada'], 1) * $recursos)));
         $semanas = round($diasLaborables / max($prod['dias_semana'], 1), 1);
         $fechaFin = $this->sumarDiasLaborables(today(), $diasLaborables);
+        $tarifa = (float) config('puntos_funcion.costos.tarifa_hora', 0);
+        $costoEstimado = $tarifa > 0 ? round($horas * $tarifa, 2) : null;
 
         $hallazgos = [];
         $puntaje = 100;
@@ -127,16 +130,34 @@ class ProyectoEvaluacionDiagnosticoService
             ];
         }
 
-        $hallazgos[] = [
-            'tipo' => 'info',
-            'mensaje' => sprintf(
-                'Estimación: %s horas (~%d días laborables, %s semanas con 1 recurso a tiempo completo), asumiendo %s h/PF ajustado.',
-                number_format($horas, 1, ',', '.'),
-                $diasLaborables,
-                number_format($semanas, 1, ',', '.'),
-                number_format($prod['horas_por_pf'], 1, ',', '.'),
-            ),
-        ];
+        $requerimientosActivos = $proyecto->requerimientos
+            ->where('estado', '!=', EstadoRequerimiento::Finalizado)
+            ->pluck('id');
+        $vinculados = $evaluacion->componentes->pluck('requerimiento_id')->filter()->unique();
+        $sinCobertura = $requerimientosActivos->diff($vinculados)->count();
+        if ($sinCobertura > 0) {
+            $puntaje -= 6;
+            $hallazgos[] = [
+                'tipo' => 'alerta',
+                'mensaje' => sprintf(
+                    '%d requerimiento(s) activo(s) del proyecto no tienen componente PF asociado en esta evaluación.',
+                    $sinCobertura,
+                ),
+            ];
+        }
+
+        $mensajeEsfuerzo = sprintf(
+            'Estimación: %s horas (~%d días laborables, %s semanas con %d recurso(s) a tiempo completo), asumiendo %s h/PF ajustado.',
+            number_format($horas, 1, ',', '.'),
+            $diasLaborables,
+            number_format($semanas, 1, ',', '.'),
+            $recursos,
+            number_format($prod['horas_por_pf'], 1, ',', '.'),
+        );
+        if ($costoEstimado !== null) {
+            $mensajeEsfuerzo .= sprintf(' Costo de referencia: %s.', number_format($costoEstimado, 2, ',', '.'));
+        }
+        $hallazgos[] = ['tipo' => 'info', 'mensaje' => $mensajeEsfuerzo];
 
         $viabilidad = $this->clasificarViabilidad($puntaje, $bloqueoPlazo, $umbrales);
 
@@ -161,9 +182,20 @@ class ProyectoEvaluacionDiagnosticoService
             [
                 'horas_por_pf' => $prod['horas_por_pf'],
                 'horas_jornada' => $prod['horas_jornada'],
+                'recursos' => $recursos,
+                'tarifa_hora' => $tarifa,
+                'costo_estimado' => $costoEstimado,
             ],
             $hallazgos,
         );
+    }
+
+    /**
+     * @param  array<string, float|int|null>  $parametros
+     */
+    public function desdeSnapshot(?array $snapshot): ?array
+    {
+        return $snapshot;
     }
 
     /**

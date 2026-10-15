@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Requerimientos;
 
 use App\Enums\EstadoProyecto;
+use App\Enums\PrioridadRequerimiento;
 use App\Models\Requerimiento;
 use Carbon\Carbon;
 use Illuminate\Database\Query\Builder;
@@ -33,6 +34,7 @@ class RequerimientoRequest extends FormRequest
             'descripcion' => ['required', 'string', 'max:20000'],
             'fecha_solicitud' => ['required', 'date_format:d/m/Y'],
             'fecha_vencimiento' => ['required', 'date_format:d/m/Y', 'after_or_equal:fecha_solicitud'],
+            'prioridad' => ['nullable', 'string', Rule::enum(PrioridadRequerimiento::class)],
             'adjuntos' => ['nullable', 'array', 'max:'.self::MAX_ADJUNTOS],
             'adjuntos.*' => AdjuntoRequest::reglasArchivo(),
         ];
@@ -71,6 +73,7 @@ class RequerimientoRequest extends FormRequest
             'descripcion' => $this->validated('descripcion'),
             'fecha_solicitud' => Carbon::createFromFormat('d/m/Y', $this->validated('fecha_solicitud'))->startOfDay(),
             'fecha_vencimiento' => Carbon::createFromFormat('d/m/Y', $this->validated('fecha_vencimiento'))->startOfDay(),
+            'prioridad' => PrioridadRequerimiento::from($this->validated('prioridad') ?? PrioridadRequerimiento::Media->value),
         ];
     }
 }

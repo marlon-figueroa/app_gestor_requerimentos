@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Proyecto;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -16,6 +17,10 @@ class DatabaseSeeder extends Seeder
             RolesAndPermissionsSeeder::class,
             UsuariosSeeders::class,
         ]);
+
+        if (Proyecto::query()->doesntExist()) {
+            $this->call(ProyectoSeeder::class);
+        }
 
         if (app()->isLocal() && User::role('Usuario')->doesntExist()) {
             User::factory(15)

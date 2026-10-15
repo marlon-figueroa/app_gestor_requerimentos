@@ -80,6 +80,21 @@ class RequerimientoPolicy
             && $requerimiento->estado === EstadoRequerimiento::EnDesarrollo;
     }
 
+    public function liberar(User $user, Requerimiento $requerimiento): bool
+    {
+        return $user->can('requerimientos.revisar')
+            && $requerimiento->estado === EstadoRequerimiento::EnRevision
+            && $requerimiento->gestor_id !== null
+            && ($requerimiento->gestor_id === $user->id || $user->hasRole('Administrador'));
+    }
+
+    public function reasignar(User $user, Requerimiento $requerimiento): bool
+    {
+        return $user->can('requerimientos.revisar')
+            && $requerimiento->estado === EstadoRequerimiento::EnRevision
+            && $requerimiento->gestor_id !== null;
+    }
+
     public function gestionarCasosUso(User $user, Requerimiento $requerimiento): bool
     {
         return $this->update($user, $requerimiento)

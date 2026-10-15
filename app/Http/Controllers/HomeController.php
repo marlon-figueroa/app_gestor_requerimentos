@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Services\ProyectoDashboardService;
 use App\Services\RequerimientoDashboardService;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -17,10 +18,13 @@ class HomeController extends Controller
     /**
      * Muestra el panel principal.
      */
-    public function index(RequerimientoDashboardService $dashboard)
+    public function index(RequerimientoDashboardService $dashboard, ProyectoDashboardService $proyectosDashboard)
     {
         $user = auth()->user();
         $graficas = $dashboard->graficas($user);
+        $kpisProyectos = $user->canAny(['proyectos.ver', 'proyectos.ver_limitado'])
+            ? $proyectosDashboard->kpis($user)
+            : null;
 
         $stats = [
             [
@@ -46,6 +50,6 @@ class HomeController extends Controller
             ],
         ];
 
-        return view('home', compact('stats', 'graficas'));
+        return view('home', compact('stats', 'graficas', 'kpisProyectos'));
     }
 }

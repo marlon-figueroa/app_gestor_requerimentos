@@ -10,6 +10,21 @@
         </span>
 
         <ul class="navbar-nav ms-auto align-items-center">
+            <li class="nav-item dropdown me-2" id="notificaciones-menu">
+                <a class="nav-link position-relative" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" id="notificaciones-toggle" title="Notificaciones">
+                    <i class="bi bi-bell fs-5"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill text-bg-danger d-none" id="notificaciones-badge">0</span>
+                </a>
+                <div class="dropdown-menu dropdown-menu-end p-0" style="min-width: 22rem; max-width: 24rem;">
+                    <div class="dropdown-header d-flex justify-content-between align-items-center">
+                        <span>Notificaciones</span>
+                        <button type="button" class="btn btn-link btn-sm p-0" id="notificaciones-marcar-todas">Marcar leídas</button>
+                    </div>
+                    <div id="notificaciones-lista" class="list-group list-group-flush small" style="max-height: 320px; overflow-y: auto;">
+                        <div class="list-group-item text-body-secondary">Cargando…</div>
+                    </div>
+                </div>
+            </li>
             @include('partials.theme-toggle')
 
             <li class="nav-item dropdown">

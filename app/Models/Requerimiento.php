@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\EstadoRequerimiento;
+use App\Enums\PrioridadRequerimiento;
 use Database\Factories\RequerimientoFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -25,17 +26,20 @@ class Requerimiento extends Model
         'descripcion',
         'fecha_solicitud',
         'fecha_vencimiento',
+        'prioridad',
         'solicitante_id',
     ];
 
     protected $attributes = [
         'estado' => 'borrador',
+        'prioridad' => 'media',
     ];
 
     protected function casts(): array
     {
         return [
             'estado' => EstadoRequerimiento::class,
+            'prioridad' => PrioridadRequerimiento::class,
             'fecha_solicitud' => 'date',
             'fecha_vencimiento' => 'date',
             'enviado_at' => 'datetime',
@@ -83,6 +87,11 @@ class Requerimiento extends Model
     public function revisiones(): HasMany
     {
         return $this->hasMany(RequerimientoRevision::class)->orderByDesc('created_at')->orderByDesc('id');
+    }
+
+    public function comentarios(): HasMany
+    {
+        return $this->hasMany(RequerimientoComentario::class)->orderBy('created_at');
     }
 
     /**

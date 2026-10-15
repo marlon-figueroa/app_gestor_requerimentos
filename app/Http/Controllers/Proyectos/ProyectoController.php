@@ -8,8 +8,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Proyectos\ProyectoRequest;
 use App\Models\Proyecto;
 use App\Models\ProyectoAdjunto;
+use App\Models\ProyectoMiembro;
+use App\Models\User;
 use App\Services\ProyectoDiagramaService;
 use App\Services\ProyectoEvaluacionDiagnosticoService;
+use App\Services\ProyectoEvaluacionSnapshotService;
 use App\Services\ProyectoFlujoService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Eloquent\Builder;
@@ -27,7 +30,22 @@ class ProyectoController extends Controller
         return view('proyectos.index', [
             'estados' => EstadoProyecto::opciones(),
             'responsables' => ProyectoRequest::responsables()->pluck('name', 'id')->all(),
+            'soloResumen' => auth()->user()->can('proyectos.ver_limitado') && ! auth()->user()->can('proyectos.ver'),
         ]);
+    }
+
+    public function misProyectos()
+    {
+        $this->authorize('viewAny', Proyecto::class);
+
+        $proyectos = Proyecto::query()
+            ->accesiblesPara(auth()->user())
+            ->with('responsable')
+            ->withCount(['requerimientos', 'requerimientosPendientes'])
+            ->orderByDesc('id')
+            ->get();
+
+        return view('proyectos.mis-proyectos', compact('proyectos'));
     }
 
     public function data(Request $request): JsonResponse
@@ -52,6 +70,7 @@ class ProyectoController extends Controller
         return view('proyectos.create', [
             'proyecto' => new Proyecto,
             'responsables' => ProyectoRequest::responsables()->pluck('name', 'id')->all(),
+            'colaboradores' => User::orderBy('name')->pluck('name', 'id')->all(),
         ]);
     }
 
@@ -71,6 +90,7 @@ class ProyectoController extends Controller
         });
 
         $this->guardarAdjuntos($request, $proyecto);
+        $this->sincronizarMiembros($proyecto, $request->miembrosIds());
 
         return redirect()->route('proyectos.show', $proyecto)->with('success', 'Proyecto creado y activo.');
     }
@@ -79,22 +99,35 @@ class ProyectoController extends Controller
     {
         $this->authorize('view', $proyecto);
 
-        $proyecto->load(['responsable', 'creador', 'adjuntos.autor', 'revisiones.usuario', 'requerimientos.solicitante', 'requerimientos.gestor', 'evaluacionesPf.creador']);
+        $proyecto->load(['responsable', 'creador', 'miembros.usuario', 'adjuntos.autor', 'revisiones.usuario', 'requerimientos.solicitante', 'requerimientos.gestor', 'evaluacionesPf.creador']);
+
+        $usuario = auth()->user();
+        $requerimientosVisibles = $proyecto->requerimientos->filter(fn ($r) => $usuario->can('view', $r));
+        $requerimientosOcultos = $proyecto->requerimientos->count() - $requerimientosVisibles->count();
 
         $acciones = collect(ProyectoFlujoService::accionesPosibles($proyecto))
-            ->filter(fn (string $accion) => auth()->user()->can($accion, $proyecto))
+            ->filter(fn (string $accion) => $usuario->can($accion, $proyecto))
             ->values();
 
         $pendientes = $proyecto->requerimientos->where('estado', '!=', EstadoRequerimiento::Finalizado)->count();
 
         $diagrama = $diagrama->diagrama($proyecto);
 
-        $ultimaEvaluacionPf = $proyecto->evaluacionesPf->first();
+        $ultimaEvaluacionPf = ProyectoEvaluacionSnapshotService::evaluacionVigente($proyecto);
         $diagnosticoPfUltima = $ultimaEvaluacionPf
-            ? $diagnosticoPf->diagnosticar($proyecto, $ultimaEvaluacionPf)
+            ? ($ultimaEvaluacionPf->diagnostico_snapshot ?? $diagnosticoPf->diagnosticar($proyecto, $ultimaEvaluacionPf))
             : null;
 
-        return view('proyectos.show', compact('proyecto', 'acciones', 'pendientes', 'diagrama', 'ultimaEvaluacionPf', 'diagnosticoPfUltima'));
+        return view('proyectos.show', compact(
+            'proyecto',
+            'acciones',
+            'pendientes',
+            'diagrama',
+            'ultimaEvaluacionPf',
+            'diagnosticoPfUltima',
+            'requerimientosVisibles',
+            'requerimientosOcultos',
+        ));
     }
 
     public function edit(Proyecto $proyecto)
@@ -102,9 +135,12 @@ class ProyectoController extends Controller
         $this->authorize('update', $proyecto);
         $this->exigirActivo($proyecto);
 
+        $proyecto->load('miembros');
+
         return view('proyectos.edit', [
             'proyecto' => $proyecto,
             'responsables' => ProyectoRequest::responsables()->pluck('name', 'id')->all(),
+            'colaboradores' => User::orderBy('name')->pluck('name', 'id')->all(),
         ]);
     }
 
@@ -115,6 +151,7 @@ class ProyectoController extends Controller
 
         $proyecto->update($request->datos());
         $this->guardarAdjuntos($request, $proyecto);
+        $this->sincronizarMiembros($proyecto, $request->miembrosIds());
 
         return redirect()->route('proyectos.show', $proyecto)->with('success', 'Proyecto actualizado correctamente.');
     }
@@ -159,6 +196,7 @@ class ProyectoController extends Controller
     {
         return Proyecto::query()
             ->select('proyectos.*')
+            ->accesiblesPara($request->user())
             ->with('responsable')
             ->withCount(['requerimientos', 'requerimientosPendientes'])
             ->when(
@@ -166,5 +204,24 @@ class ProyectoController extends Controller
                 fn (Builder $q, EstadoProyecto $estado) => $q->where('proyectos.estado', $estado),
             )
             ->when($request->filled('responsable_id'), fn (Builder $q) => $q->where('proyectos.responsable_id', (int) $request->input('responsable_id')));
+    }
+
+    /**
+     * @param  list<int>  $miembros
+     */
+    private function sincronizarMiembros(Proyecto $proyecto, array $miembros): void
+    {
+        $miembros = collect($miembros)
+            ->reject(fn (int $id) => $id === (int) $proyecto->responsable_id)
+            ->values();
+
+        $proyecto->miembros()->whereNotIn('user_id', $miembros)->delete();
+
+        foreach ($miembros as $userId) {
+            ProyectoMiembro::firstOrCreate([
+                'proyecto_id' => $proyecto->id,
+                'user_id' => $userId,
+            ], ['rol' => 'colaborador']);
+        }
     }
 }

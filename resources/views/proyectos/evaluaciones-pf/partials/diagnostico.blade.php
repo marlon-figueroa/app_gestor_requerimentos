@@ -1,5 +1,6 @@
 @php
     $v = $diagnostico['viabilidad'];
+    $v = $v instanceof \App\Enums\ViabilidadPf ? $v : \App\Enums\ViabilidadPf::from($v);
 @endphp
 
 <div @class([

@@ -14,12 +14,25 @@ class ProyectoPolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->can('proyectos.ver');
+        return $user->canAny(['proyectos.ver', 'proyectos.ver_limitado']);
     }
 
     public function view(User $user, Proyecto $proyecto): bool
     {
-        return $user->can('proyectos.ver');
+        if ($user->can('proyectos.ver')) {
+            return $this->respetaScopeResponsable($user, $proyecto);
+        }
+
+        if ($user->can('proyectos.ver_limitado')) {
+            return $this->participaEnProyecto($user, $proyecto);
+        }
+
+        return false;
+    }
+
+    public function viewResumen(User $user, Proyecto $proyecto): bool
+    {
+        return $this->view($user, $proyecto);
     }
 
     public function create(User $user): bool
@@ -29,7 +42,9 @@ class ProyectoPolicy
 
     public function update(User $user, Proyecto $proyecto): bool
     {
-        return $user->can('proyectos.editar') && $proyecto->estado === EstadoProyecto::Activo;
+        return $user->can('proyectos.editar')
+            && $proyecto->estado === EstadoProyecto::Activo
+            && $this->respetaScopeResponsable($user, $proyecto);
     }
 
     public function export(User $user, Proyecto $proyecto): bool
@@ -54,6 +69,28 @@ class ProyectoPolicy
 
     private function puedeCerrar(User $user, Proyecto $proyecto): bool
     {
-        return $user->can('proyectos.cerrar') && $proyecto->estado === EstadoProyecto::Activo;
+        return $user->can('proyectos.cerrar')
+            && $proyecto->estado === EstadoProyecto::Activo
+            && $this->respetaScopeResponsable($user, $proyecto);
+    }
+
+    private function respetaScopeResponsable(User $user, Proyecto $proyecto): bool
+    {
+        if (! config('proyectos.scope_responsable') || $user->hasRole('Administrador')) {
+            return true;
+        }
+
+        if (! $user->can('proyectos.crear')) {
+            return true;
+        }
+
+        return $proyecto->responsable_id === $user->id
+            || $proyecto->miembros()->where('user_id', $user->id)->exists();
+    }
+
+    private function participaEnProyecto(User $user, Proyecto $proyecto): bool
+    {
+        return $proyecto->requerimientos()->where('solicitante_id', $user->id)->exists()
+            || $proyecto->miembros()->where('user_id', $user->id)->exists();
     }
 }

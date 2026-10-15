@@ -21,14 +21,25 @@
                     </span>
                 @endforeach
             </div>
-            <div style="min-width: 14rem">
-                <label for="calendario-estado" class="visually-hidden">Estado</label>
-                <select id="calendario-estado" class="form-select form-select-sm">
-                    <option value="">Todos los estados</option>
-                    @foreach ($estados as $estado)
-                        <option value="{{ $estado->value }}">{{ $estado->label() }}</option>
-                    @endforeach
-                </select>
+            <div class="d-flex flex-wrap gap-2">
+                <div style="min-width: 14rem">
+                    <label for="calendario-proyecto" class="visually-hidden">Proyecto</label>
+                    <select id="calendario-proyecto" class="form-select form-select-sm">
+                        <option value="">Todos los proyectos</option>
+                        @foreach ($proyectos as $id => $label)
+                            <option value="{{ $id }}" @selected($proyectoId == $id)>{{ $label }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div style="min-width: 14rem">
+                    <label for="calendario-estado" class="visually-hidden">Estado</label>
+                    <select id="calendario-estado" class="form-select form-select-sm">
+                        <option value="">Todos los estados</option>
+                        @foreach ($estados as $estado)
+                            <option value="{{ $estado->value }}">{{ $estado->label() }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
         </div>
         <div class="card-body">

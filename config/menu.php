@@ -26,6 +26,7 @@ return [
         'icon' => 'briefcase',
         'children' => [
             ['label' => 'Listado', 'icon' => 'list', 'route' => 'proyectos.index', 'active' => ['proyectos.index', 'proyectos.create', 'proyectos.show', 'proyectos.edit', 'proyectos.evaluaciones-pf.*'], 'can' => 'proyectos.ver'],
+            ['label' => 'Mis proyectos', 'icon' => 'folder', 'route' => 'proyectos.mis-proyectos', 'can' => 'proyectos.ver_limitado'],
         ],
     ],
     [
