@@ -9,6 +9,7 @@ export default defineConfig({
                 'resources/js/app.js',
                 'resources/js/pages/usuarios.js',
                 'resources/js/pages/usuario-form.js',
+                'resources/js/pages/perfil.js',
                 'resources/js/pages/roles.js',
                 'resources/js/pages/rol-form.js',
                 'resources/js/pages/permisos.js',

@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\NotificacionController;
 use App\Http\Controllers\Proyectos\AdjuntoController as ProyectoAdjuntoController;
 use App\Http\Controllers\Proyectos\EvaluacionPfController;
@@ -29,6 +30,10 @@ Auth::routes();
 
 Route::middleware('auth')->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
+
+    Route::get('perfil', [PerfilController::class, 'show'])->name('perfil.show');
+    Route::put('perfil', [PerfilController::class, 'update'])->name('perfil.update');
+    Route::put('perfil/contrasena', [PerfilController::class, 'updatePassword'])->name('perfil.password');
 
     Route::get('notificaciones', [NotificacionController::class, 'index'])->name('notificaciones.index');
     Route::post('notificaciones/{id}/leida', [NotificacionController::class, 'marcarLeida'])->name('notificaciones.leida');

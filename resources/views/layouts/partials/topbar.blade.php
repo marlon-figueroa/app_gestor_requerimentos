@@ -40,6 +40,10 @@
                         <div class="small text-body-secondary">{{ Auth::user()->getRoleNames()->implode(', ') ?: 'Sin rol' }}</div>
                     </div>
                     <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="{{ route('perfil.show') }}">
+                        <i class="bi bi-person-circle me-2"></i> Mi perfil
+                    </a>
+                    <div class="dropdown-divider"></div>
                     @impersonating
                         <form method="POST" action="{{ route('impersonate.leave') }}">
                             @csrf

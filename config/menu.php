@@ -22,6 +22,11 @@ return [
         'route' => 'home',
     ],
     [
+        'label' => 'Mi perfil',
+        'icon' => 'user',
+        'route' => 'perfil.show',
+    ],
+    [
         'label' => 'Proyectos',
         'icon' => 'briefcase',
         'children' => [
