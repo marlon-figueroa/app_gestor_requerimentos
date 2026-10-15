@@ -3,10 +3,17 @@
 :root,
 [data-bs-theme='light'] {
     --app-surface: #{$white};
+    --app-page-bg: #{$body-bg};
 }
 
 [data-bs-theme='dark'] {
     --app-surface: #{$gray-900};
+    --app-page-bg: #{$body-bg-dark};
+}
+
+body.app-layout,
+body.guest-layout {
+    background-color: var(--app-page-bg);
 }
 
 // Transicion suave al cambiar de tema (se omite si el usuario prefiere menos movimiento).
@@ -14,10 +21,16 @@
     body,
     .card,
     .navbar,
+    .app-sidebar,
+    .app-sidebar-panel,
     .form-control,
     .form-select,
     .select2-selection {
         transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .app-sidebar-nav .feather {
+        transition: color 0.15s ease;
     }
 }
 

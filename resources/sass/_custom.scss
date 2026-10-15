@@ -13,12 +13,45 @@ body {
 }
 
 // Layout del sistema: sidebar | (topbar / content / footer)
-:root {
-    --app-sidebar-bg: #{$navy-dark};
+:root,
+[data-bs-theme='light'] {
+    --app-brand-gradient: linear-gradient(135deg, #{$primary} 0%, #{$brand-accent} 100%);
+    --app-sidebar-bg: #f1f5f9;
+    --app-sidebar-border: #{$gray-200};
+    --app-sidebar-text: #{$gray-800};
+    --app-sidebar-text-muted: #{$gray-600};
+    --app-sidebar-icon: #{$sidebar-icon-color-light};
+    --app-sidebar-hover-bg: rgba(13, 110, 253, 0.08);
+    --app-sidebar-hover-text: #{$gray-900};
+    --app-sidebar-branch-open: #{$gray-900};
+    --app-sidebar-submenu-border: #{$gray-300};
+    --app-sidebar-chevron: #{$gray-400};
+    --app-topbar-bg: #{$white};
+    --app-topbar-color: #{$navy};
+    --app-topbar-muted: #{$gray-600};
+    --app-topbar-border: #{$gray-200};
+    --app-topbar-icon: #{$sidebar-icon-color-light};
+    --app-topbar-hover: rgba(13, 110, 253, 0.08);
 }
 
-:root[data-bs-theme='dark'] {
+[data-bs-theme='dark'] {
+    --app-brand-gradient: linear-gradient(135deg, #{$navy-dark} 0%, #{$primary} 100%);
     --app-sidebar-bg: #{$navy-darker};
+    --app-sidebar-border: rgba(255, 255, 255, 0.08);
+    --app-sidebar-text: rgba(255, 255, 255, 0.78);
+    --app-sidebar-text-muted: rgba(255, 255, 255, 0.55);
+    --app-sidebar-icon: #{$sidebar-icon-color-dark};
+    --app-sidebar-hover-bg: rgba(255, 255, 255, 0.08);
+    --app-sidebar-hover-text: #{$white};
+    --app-sidebar-branch-open: #{$white};
+    --app-sidebar-submenu-border: rgba(255, 255, 255, 0.12);
+    --app-sidebar-chevron: rgba(255, 255, 255, 0.45);
+    --app-topbar-bg: #{$navy-dark};
+    --app-topbar-color: rgba(255, 255, 255, 0.92);
+    --app-topbar-muted: rgba(255, 255, 255, 0.65);
+    --app-topbar-border: rgba(255, 255, 255, 0.08);
+    --app-topbar-icon: #{$sidebar-icon-color-dark};
+    --app-topbar-hover: rgba(255, 255, 255, 0.1);
 }
 
 .app-wrapper {
@@ -59,14 +92,37 @@ body {
     gap: 0.75rem;
     height: $topbar-height;
     padding: 0 $spacer;
-    border-bottom: 1px solid rgba($white, 0.1);
+    border-bottom: 1px solid var(--app-sidebar-border);
+    background-color: var(--app-sidebar-bg);
 
     > a {
         min-width: 0;
+        color: var(--app-sidebar-text);
+        font-weight: 700;
+        letter-spacing: -0.01em;
+
+        &:hover,
+        &:focus-visible {
+            color: var(--app-sidebar-hover-text);
+        }
     }
+}
+
+.app-sidebar-brand-mark {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.65rem;
+    background: var(--app-brand-gradient);
+    box-shadow: 0 4px 14px rgba(13, 110, 253, 0.25);
 
     .feather {
-        color: $sidebar-icon-color;
+        width: 1.15rem;
+        height: 1.15rem;
+        color: $white;
     }
 }
 
@@ -74,7 +130,7 @@ body {
     padding: $spacer * 0.75;
 
     .nav {
-        gap: 0.125rem;
+        gap: 0.2rem;
     }
 
     .nav-link {
@@ -83,26 +139,34 @@ body {
         gap: 0.75rem;
         padding: 0.55rem 0.75rem;
         border-radius: $border-radius;
-        color: rgba($white, 0.75);
+        color: var(--app-sidebar-text);
+        font-weight: 500;
 
         .app-sidebar-icon {
             width: 1.15rem;
             height: 1.15rem;
+            flex-shrink: 0;
         }
 
         .feather {
-            color: $sidebar-icon-color;
+            color: var(--app-sidebar-icon);
+            @include transition(color 0.15s ease);
         }
 
         &:hover,
         &:focus-visible {
-            color: $white;
-            background-color: rgba($white, 0.08);
+            color: var(--app-sidebar-hover-text);
+            background-color: var(--app-sidebar-hover-bg);
+
+            .feather {
+                color: var(--app-sidebar-icon);
+            }
         }
 
         &.active {
             color: $white;
             background-color: $primary;
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.35);
 
             .feather {
                 color: $white;
@@ -110,20 +174,25 @@ body {
         }
     }
 
-    // Árbol: ramas colapsables y sangría por nivel
     .app-sidebar-branch {
         border: 0;
         background: none;
         text-align: start;
+        color: var(--app-sidebar-text);
 
         &:not(.collapsed) {
-            color: $white;
+            color: var(--app-sidebar-branch-open);
+            font-weight: 600;
+
+            .feather.app-sidebar-icon {
+                color: var(--app-sidebar-icon);
+            }
         }
 
         .app-sidebar-chevron {
             width: 1rem;
             height: 1rem;
-            color: rgba($white, 0.5);
+            color: var(--app-sidebar-chevron);
             @include transition(transform 0.2s ease-in-out);
         }
 
@@ -135,11 +204,21 @@ body {
     .app-sidebar-submenu {
         margin: 0.125rem 0 0.25rem calc(0.75rem + 0.575rem);
         padding-left: 0.5rem;
-        border-left: 1px solid rgba($white, 0.12);
+        border-left: 1px solid var(--app-sidebar-submenu-border);
 
         .nav-link {
             padding-block: 0.45rem;
             font-size: 0.925rem;
+            font-weight: 500;
+            color: var(--app-sidebar-text-muted);
+
+            .feather {
+                color: var(--app-sidebar-icon);
+            }
+
+            &.active {
+                color: $white;
+            }
         }
     }
 }
@@ -157,12 +236,52 @@ body {
     z-index: $zindex-sticky;
     height: $topbar-height;
     padding-block: 0;
+    background-color: var(--app-topbar-bg) !important;
+    color: var(--app-topbar-color);
+    border-bottom: 1px solid var(--app-topbar-border);
+
+    .navbar-text {
+        color: var(--app-topbar-color) !important;
+    }
+
+    .nav-link {
+        color: var(--app-topbar-muted);
+
+        &:hover,
+        &:focus-visible {
+            color: var(--app-topbar-color);
+            background-color: var(--app-topbar-hover);
+            border-radius: $border-radius;
+        }
+    }
+
+    .theme-toggle .nav-link,
+    #notificaciones-toggle {
+        color: var(--app-topbar-icon);
+
+        &:hover,
+        &:focus-visible {
+            color: var(--app-topbar-color);
+        }
+    }
+
+    .navbar-brand {
+        color: var(--app-topbar-color);
+
+        &:hover,
+        &:focus-visible {
+            color: var(--app-topbar-color);
+            opacity: 0.92;
+        }
+    }
 }
 
 .app-sidebar-toggle {
-    --bs-btn-color: #{$sidebar-icon-color};
-    --bs-btn-hover-color: #{$white};
-    --bs-btn-active-color: #{$white};
+    --bs-btn-color: var(--app-topbar-icon);
+    --bs-btn-hover-color: var(--app-topbar-color);
+    --bs-btn-active-color: var(--app-topbar-color);
+    --bs-btn-hover-bg: var(--app-topbar-hover);
+    --bs-btn-active-bg: var(--app-topbar-hover);
     font-size: 1.35rem;
     line-height: 1;
 }
@@ -194,11 +313,13 @@ body {
 }
 
 .bg-navy {
-    background-color: $navy !important;
+    background-color: var(--app-topbar-bg, $navy) !important;
+    color: var(--app-topbar-color, #{$white});
+    border-bottom: 1px solid var(--app-topbar-border, transparent);
+}
 
-    [data-bs-theme='dark'] & {
-        background-color: $navy-dark !important;
-    }
+.app-footer {
+    background-color: var(--app-surface) !important;
 }
 
 .card {
@@ -215,9 +336,13 @@ body {
     line-height: 1.2;
 }
 
-.stat-card .stat-icon {
-    font-size: 2.5rem;
-    opacity: 0.75;
+.stat-card {
+    border: 1px solid var(--bs-border-color-translucent);
+
+    .stat-icon {
+        font-size: 2.5rem;
+        opacity: 0.85;
+    }
 }
 
 .dashboard-grafica {

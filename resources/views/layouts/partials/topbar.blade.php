@@ -1,11 +1,11 @@
-<nav class="app-topbar navbar navbar-expand navbar-dark bg-navy shadow-sm">
+<nav class="app-topbar navbar navbar-expand shadow-sm">
     <div class="container-fluid">
         <button type="button" class="btn border-0 app-sidebar-toggle px-2 me-2" data-sidebar-toggle
                 aria-controls="app-sidebar" aria-label="Mostrar u ocultar menú lateral">
             <i data-feather="grid"></i>
         </button>
 
-        <span class="navbar-text text-white fw-semibold text-truncate">
+        <span class="navbar-text fw-semibold text-truncate">
             @yield('title', 'Inicio')
         </span>
 

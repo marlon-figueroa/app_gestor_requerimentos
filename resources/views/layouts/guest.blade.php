@@ -3,11 +3,13 @@
 @section('body-class', 'guest-layout')
 
 @section('body')
-    <nav class="navbar navbar-expand navbar-dark bg-navy shadow-sm">
+    <nav class="navbar navbar-expand app-topbar shadow-sm">
         <div class="container">
-            <a class="navbar-brand" href="{{ url('/') }}">
-                <i class="bi bi-clipboard-check me-1"></i>
-                {{ config('app.name', 'Laravel') }}
+            <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url('/') }}">
+                <span class="app-sidebar-brand-mark" aria-hidden="true">
+                    <i data-feather="clipboard"></i>
+                </span>
+                <span class="fw-bold">{{ config('app.name', 'Laravel') }}</span>
             </a>
 
             <ul class="navbar-nav ms-auto">
