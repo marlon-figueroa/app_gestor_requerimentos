@@ -1,0 +1,38 @@
+# Blueprint Render (plan Free): conectar repo y desplegar con SQLite.
+# Documentación: docs/deploy-github-sqlite.md
+
+services:
+  - type: web
+    name: gestor-requerimientos
+    runtime: docker
+    dockerfilePath: ./deploy/Dockerfile
+    dockerContext: .
+    plan: free
+    healthCheckPath: /up
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY
+        generateValue: true
+      - key: APP_URL
+        sync: false
+      - key: DB_CONNECTION
+        value: sqlite
+      - key: DB_DATABASE
+        value: /var/www/html/storage/app/database.sqlite
+      - key: SESSION_DRIVER
+        value: file
+      - key: CACHE_STORE
+        value: file
+      - key: QUEUE_CONNECTION
+        value: sync
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: PULSE_ENABLED
+        value: "false"
+      - key: APP_RUN_MIGRATIONS
+        value: "true"
+      - key: APP_RUN_SEEDERS
+        value: "false"

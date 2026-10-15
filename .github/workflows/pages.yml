@@ -1,0 +1,44 @@
+name: GitHub Pages
+
+# Publica la landing estática en docs/. La aplicación Laravel NO corre en Pages;
+# la demo vive en Render (ver docs/deploy-github-sqlite.md).
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Inyectar URL de la demo
+        run: |
+          url="${{ vars.DEMO_APP_URL }}"
+          if [ -z "$url" ]; then
+            url="https://gestor-requerimientos.onrender.com"
+          fi
+          sed -i "s|__DEMO_APP_URL__|${url}|g" docs/index.html
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
