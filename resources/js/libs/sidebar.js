@@ -1,9 +1,12 @@
 /**
  * Boton de menu del topbar: en escritorio (>= lg) estrecha el sidebar (solo iconos) o lo
  * expande, y recuerda la preferencia; en pantallas pequenas abre el sidebar como offcanvas.
+ * Con el sidebar colapsado, un clic en una rama de primer nivel expande el panel completo.
  */
 const STORAGE_KEY = 'sidebar';
 const desktop = window.matchMedia('(min-width: 992px)');
+
+const topLevelBranchSelector = '.app-sidebar-nav > .nav > .app-sidebar-item > .app-sidebar-branch';
 
 function storeCollapsed(collapsed) {
     try {
@@ -17,15 +20,33 @@ function isCollapsedDesktop() {
     return desktop.matches && document.documentElement.classList.contains('sidebar-collapsed');
 }
 
-function closeFlyouts() {
-    document.querySelectorAll('.app-sidebar-flyout-open').forEach((item) => {
-        item.classList.remove('app-sidebar-flyout-open');
-    });
+function expandSidebarDesktop() {
+    document.documentElement.classList.remove('sidebar-collapsed');
+    storeCollapsed(false);
+    updateToggles();
+}
+
+function openSidebarBranch(branchButton) {
+    const selector = branchButton.getAttribute('data-bs-target');
+
+    if (! selector) {
+        return;
+    }
+
+    const panel = document.querySelector(selector);
+
+    if (! panel || ! window.bootstrap?.Collapse) {
+        return;
+    }
+
+    window.bootstrap.Collapse.getOrCreateInstance(panel, { toggle: false }).show();
+    branchButton.classList.remove('collapsed');
+    branchButton.setAttribute('aria-expanded', 'true');
 }
 
 function updateToggles() {
     const expanded = desktop.matches
-        ? !document.documentElement.classList.contains('sidebar-collapsed')
+        ? ! document.documentElement.classList.contains('sidebar-collapsed')
         : document.getElementById('app-sidebar')?.classList.contains('show') ?? false;
 
     document.querySelectorAll('[data-sidebar-toggle]').forEach((button) => {
@@ -36,7 +57,7 @@ function updateToggles() {
 export function initSidebar() {
     const sidebar = document.getElementById('app-sidebar');
 
-    if (!sidebar) {
+    if (! sidebar) {
         return;
     }
 
@@ -45,9 +66,6 @@ export function initSidebar() {
             if (desktop.matches) {
                 const collapsed = document.documentElement.classList.toggle('sidebar-collapsed');
                 storeCollapsed(collapsed);
-                if (! collapsed) {
-                    closeFlyouts();
-                }
             } else {
                 window.bootstrap.Offcanvas.getOrCreateInstance(sidebar).toggle();
             }
@@ -64,7 +82,7 @@ export function initSidebar() {
             return;
         }
 
-        const branch = event.target.closest('.app-sidebar-nav > .nav > .app-sidebar-item > .app-sidebar-branch');
+        const branch = event.target.closest(topLevelBranchSelector);
 
         if (! branch) {
             return;
@@ -73,26 +91,8 @@ export function initSidebar() {
         event.preventDefault();
         event.stopPropagation();
 
-        const item = branch.closest('.app-sidebar-item');
-        const pin = ! item.classList.contains('app-sidebar-flyout-open');
-
-        closeFlyouts();
-
-        if (pin) {
-            item.classList.add('app-sidebar-flyout-open');
-        }
-    });
-
-    document.addEventListener('click', (event) => {
-        if (! isCollapsedDesktop()) {
-            return;
-        }
-
-        if (event.target.closest('.app-sidebar-nav > .nav > .app-sidebar-item')) {
-            return;
-        }
-
-        closeFlyouts();
+        expandSidebarDesktop();
+        openSidebarBranch(branch);
     });
 
     desktop.addEventListener('change', () => {
@@ -100,7 +100,6 @@ export function initSidebar() {
             window.bootstrap.Offcanvas.getInstance(sidebar)?.hide();
         }
 
-        closeFlyouts();
         updateToggles();
     });
 
