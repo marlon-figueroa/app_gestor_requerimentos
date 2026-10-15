@@ -47,7 +47,7 @@
                                     <td class="text-end">{{ number_format($evaluacion->total_ajustado, 2, ',', '.') }}</td>
                                     @php $d = $diagnosticos[$evaluacion->id]; @endphp
                                     <td>
-                                        <span class="badge text-bg-{{ $d['viabilidad']->color() }}">{{ $d['viabilidad']->label() }}</span>
+                                        <x-viabilidad-pf-badge :viabilidad="$d['viabilidad']" :short="true" />
                                     </td>
                                     <td class="text-end small">{{ $d['tiempo']['dias_laborables'] }} días lab.</td>
                                     <td>{{ $evaluacion->creador?->name ?? '—' }}</td>

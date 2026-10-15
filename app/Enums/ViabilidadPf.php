@@ -19,6 +19,16 @@ enum ViabilidadPf: string
         };
     }
 
+    public function labelCorto(): string
+    {
+        return match ($this) {
+            self::Alta => 'Alta',
+            self::Media => 'Media',
+            self::Baja => 'Baja',
+            self::NoViable => 'No viable',
+        };
+    }
+
     public function color(): string
     {
         return match ($this) {
@@ -32,10 +42,10 @@ enum ViabilidadPf: string
     public function icono(): string
     {
         return match ($this) {
-            self::Alta => 'check-circle',
-            self::Media => 'exclamation-circle',
-            self::Baja => 'x-circle',
-            self::NoViable => 'slash-circle',
+            self::Alta => 'check-circle-fill',
+            self::Media => 'exclamation-circle-fill',
+            self::Baja => 'x-circle-fill',
+            self::NoViable => 'slash-circle-fill',
         };
     }
 }

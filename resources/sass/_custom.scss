@@ -210,6 +210,11 @@ body {
     font-weight: 600;
 }
 
+.diagnostico-pf-card .badge {
+    --bs-badge-font-weight: 600;
+    line-height: 1.2;
+}
+
 .stat-card .stat-icon {
     font-size: 2.5rem;
     opacity: 0.75;

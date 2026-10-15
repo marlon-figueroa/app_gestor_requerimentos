@@ -186,7 +186,7 @@
                             @if ($diagnosticoPfUltima)
                                 <dt class="col-7">Viabilidad</dt>
                                 <dd class="col-5 text-end">
-                                    <span class="badge text-bg-{{ $diagnosticoPfUltima['viabilidad']->color() }}">{{ $diagnosticoPfUltima['viabilidad']->label() }}</span>
+                                    <x-viabilidad-pf-badge :viabilidad="$diagnosticoPfUltima['viabilidad']" :short="true" />
                                 </dd>
                                 <dt class="col-7">Tiempo est.</dt>
                                 <dd class="col-5 text-end">{{ $diagnosticoPfUltima['tiempo']['dias_laborables'] }} días lab.</dd>

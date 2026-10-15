@@ -2,18 +2,28 @@
     $v = $diagnostico['viabilidad'];
 @endphp
 
-<div class="card mb-4 border-{{ $v->color() }}">
-    <div class="card-header d-flex align-items-center justify-content-between bg-{{ $v->color() }} bg-opacity-10">
-        <span><i class="bi bi-clipboard2-pulse me-1"></i> Diagnóstico de viabilidad e implementación</span>
-        <span class="badge text-bg-{{ $v->color() }}">
-            <i class="bi bi-{{ $v->icono() }} me-1"></i>{{ $v->label() }}
+<div @class([
+    'card mb-4 diagnostico-pf-card border-start border-4',
+    'border-success' => $v->color() === 'success',
+    'border-warning' => $v->color() === 'warning',
+    'border-danger' => $v->color() === 'danger',
+    'border-secondary' => $v->color() === 'dark',
+])>
+    <div class="card-header d-flex flex-wrap align-items-center justify-content-between gap-2 bg-body">
+        <span class="fw-semibold">
+            <i class="bi bi-clipboard2-pulse me-1" aria-hidden="true"></i>
+            Diagnóstico de viabilidad e implementación
         </span>
+        <x-viabilidad-pf-badge :viabilidad="$v" />
     </div>
     <div class="card-body">
         <div class="row g-3 mb-3">
             <div class="col-md-4">
                 <div class="small text-body-secondary">Puntaje de viabilidad</div>
-                <div class="fs-4 fw-bold">{{ $diagnostico['puntaje'] }}/100</div>
+                <div class="d-flex flex-wrap align-items-center gap-2">
+                    <span class="fs-4 fw-bold">{{ $diagnostico['puntaje'] }}/100</span>
+                    <x-viabilidad-pf-badge :viabilidad="$v" :short="true" class="d-md-none" />
+                </div>
             </div>
             <div class="col-md-4">
                 <div class="small text-body-secondary">Esfuerzo estimado</div>
@@ -41,14 +51,14 @@
         <ul class="list-unstyled mb-0">
             @foreach ($diagnostico['hallazgos'] as $hallazgo)
                 @php
-                    $icono = match ($hallazgo['tipo']) {
-                        'critico' => 'x-octagon-fill text-danger',
-                        'alerta' => 'exclamation-triangle-fill text-warning',
-                        default => 'info-circle text-primary',
+                    [$icono, $colorIcono] = match ($hallazgo['tipo']) {
+                        'critico' => ['x-octagon-fill', 'text-danger'],
+                        'alerta' => ['exclamation-triangle-fill', 'text-warning'],
+                        default => ['info-circle-fill', 'text-primary'],
                     };
                 @endphp
                 <li class="d-flex gap-2 mb-2 small">
-                    <i class="bi bi-{{ $icono }} flex-shrink-0 mt-1"></i>
+                    <i class="bi bi-{{ $icono }} {{ $colorIcono }} flex-shrink-0 mt-1" aria-hidden="true"></i>
                     <span>{{ $hallazgo['mensaje'] }}</span>
                 </li>
             @endforeach
