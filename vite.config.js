@@ -13,6 +13,7 @@ export default defineConfig({
                 'resources/js/pages/rol-form.js',
                 'resources/js/pages/permisos.js',
                 'resources/js/pages/bitacora.js',
+                'resources/js/pages/home.js',
                 'resources/js/pages/requerimiento-form.js',
                 'resources/js/pages/requerimiento-show.js',
                 'resources/js/pages/requerimientos-kanban.js',

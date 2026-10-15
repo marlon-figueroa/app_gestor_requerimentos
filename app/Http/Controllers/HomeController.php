@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Services\RequerimientoDashboardService;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -16,9 +17,10 @@ class HomeController extends Controller
     /**
      * Muestra el panel principal.
      */
-    public function index()
+    public function index(RequerimientoDashboardService $dashboard)
     {
         $user = auth()->user();
+        $graficas = $dashboard->graficas($user);
 
         $stats = [
             [
@@ -44,6 +46,6 @@ class HomeController extends Controller
             ],
         ];
 
-        return view('home', compact('stats'));
+        return view('home', compact('stats', 'graficas'));
     }
 }

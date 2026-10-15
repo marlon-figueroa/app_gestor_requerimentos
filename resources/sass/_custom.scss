@@ -215,6 +215,15 @@ body {
     opacity: 0.75;
 }
 
+.dashboard-grafica {
+    position: relative;
+    height: 16rem;
+
+    @include media-breakpoint-up(lg) {
+        height: 20rem;
+    }
+}
+
 // Pulse y Log Viewer incrustados en las pestañas de la bitácora
 .panel-embebido {
     display: block;
