@@ -98,6 +98,12 @@ class RequerimientoDiagramaTest extends TestCase
         $this->assertSame([5], $transiciones['rechazado>en_revision']['pasos']);
         $this->assertSame([], $transiciones['en_revision>aprobado']['pasos']);
         $this->assertSame([], $transiciones['finalizado>fin']['pasos']);
+
+        $this->assertSame([2, 3, 5], array_column($estados['en_revision']['eventos'], 'numero'));
+        $this->assertSame('Envió a revisión', $estados['en_revision']['eventos'][0]['accion']);
+        $this->assertSame('Tomó el requerimiento para revisión', $estados['en_revision']['eventos'][1]['accion']);
+        $this->assertSame([], $estados['aprobado']['eventos']);
+        $this->assertTrue($estados['rechazado']['eventos'][0]['rechazo']);
     }
 
     public function test_la_vista_del_requerimiento_incluye_el_diagrama(): void

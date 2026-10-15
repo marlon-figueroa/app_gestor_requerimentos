@@ -7,7 +7,7 @@
             <p class="text-body-secondary mb-0">Este requerimiento aún no tiene pasos registrados.</p>
         @else
             <p class="small text-body-secondary">
-                Máquina de estados del requerimiento. Las transiciones recorridas llevan el evento y el número de paso; las punteadas son transiciones posibles que aún no ocurren.
+                Máquina de estados del requerimiento. Cada estado visitado muestra el detalle de los eventos que lo alcanzaron. Las flechas punteadas son transiciones posibles que aún no ocurren.
             </p>
             <div id="diagrama-estados" class="diagrama-estados" role="img" aria-label="Diagrama de estados UML del requerimiento"></div>
             <script type="application/json" id="diagrama-estados-datos">@json($diagrama)</script>

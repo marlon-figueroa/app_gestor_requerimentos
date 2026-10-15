@@ -2,6 +2,13 @@ import { dia, shapes } from '@joint/core';
 
 const FUENTE = 'Nunito, sans-serif';
 const ESTADO = { width: 128, height: 56 };
+const ANCHO_DETALLE = 248;
+const CABECERA = 36;
+const ALTO_LINEA = 13;
+const SEPARACION_EVENTO = 8;
+const RELLENO_INFERIOR = 10;
+const MAX_CARACTERES = 36;
+const MAX_LINEAS_OBSERVACION = 3;
 const INICIAL = { width: 24, height: 24 };
 const FINAL = { width: 28, height: 28 };
 const MARGEN = 12;
@@ -77,8 +84,8 @@ const Estado = dia.Element.define('uml.Estado', {
     attrs: {
         body: { width: 'calc(w)', height: 'calc(h)', rx: 14, ry: 14 },
         estereotipo: {
-            x: ESTADO.width / 2,
-            y: 16,
+            x: 'calc(w/2)',
+            y: 14,
             textAnchor: 'middle',
             textVerticalAnchor: 'middle',
             fontSize: 10,
@@ -86,12 +93,19 @@ const Estado = dia.Element.define('uml.Estado', {
             fontFamily: FUENTE,
         },
         nombre: {
-            x: ESTADO.width / 2,
+            x: 'calc(w/2)',
             textAnchor: 'middle',
             textVerticalAnchor: 'middle',
             fontSize: 13,
             fontWeight: 700,
             fontFamily: FUENTE,
+        },
+        separador: {
+            x1: 12,
+            x2: 'calc(w-12)',
+            y1: CABECERA,
+            y2: CABECERA,
+            strokeWidth: 1,
         },
     },
 }, {
@@ -118,12 +132,117 @@ function coloresTema() {
     };
 }
 
-function tamano(id) {
+function tamano(id, medidas) {
     if (id === INICIO) {
         return INICIAL;
     }
 
-    return id === FIN ? FINAL : ESTADO;
+    if (id === FIN) {
+        return FINAL;
+    }
+
+    return medidas.get(id) ?? ESTADO;
+}
+
+function partirLinea(texto, maximo) {
+    const limpio = String(texto).replace(/\s+/g, ' ').trim();
+
+    if (limpio === '') {
+        return [];
+    }
+
+    const lineas = [];
+    let resto = limpio;
+
+    while (resto.length > maximo) {
+        const corte = resto.lastIndexOf(' ', maximo);
+        const punto = corte > 0 ? corte : maximo;
+        lineas.push(resto.slice(0, punto).trim());
+        resto = resto.slice(punto).trim();
+    }
+
+    if (resto !== '') {
+        lineas.push(resto);
+    }
+
+    return lineas;
+}
+
+function limitarLineas(lineas, maximo) {
+    if (lineas.length <= maximo) {
+        return lineas;
+    }
+
+    const visibles = lineas.slice(0, maximo);
+    const ultima = visibles[maximo - 1];
+    visibles[maximo - 1] = `${ultima.replace(/…$/, '').slice(0, Math.max(0, MAX_CARACTERES - 1))}…`;
+
+    return visibles;
+}
+
+function lineasEvento(paso) {
+    const actor = [paso.actor, paso.fecha].filter(Boolean).join(' · ');
+    const lineas = [
+        ...partirLinea(`#${paso.numero} ${paso.accion}`, MAX_CARACTERES),
+        ...partirLinea(actor, MAX_CARACTERES),
+    ];
+
+    if (paso.observaciones) {
+        lineas.push(...limitarLineas(partirLinea(paso.observaciones, MAX_CARACTERES), MAX_LINEAS_OBSERVACION));
+    }
+
+    return lineas;
+}
+
+function medirEstado(eventos = []) {
+    if (!eventos.length) {
+        return { width: ESTADO.width, height: ESTADO.height, bloques: [] };
+    }
+
+    let cursor = CABECERA + 8;
+    const bloques = eventos.map((paso) => {
+        const lineas = lineasEvento(paso);
+        const bloque = {
+            y: cursor,
+            texto: lineas.join('\n'),
+            rechazo: Boolean(paso.rechazo),
+            pista: [`#${paso.numero} ${paso.accion}`, paso.actor, paso.fecha, paso.observaciones].filter(Boolean).join(' — '),
+        };
+
+        cursor += lineas.length * ALTO_LINEA + SEPARACION_EVENTO;
+
+        return bloque;
+    });
+
+    return {
+        width: ANCHO_DETALLE,
+        height: cursor - SEPARACION_EVENTO + RELLENO_INFERIOR,
+        bloques,
+    };
+}
+
+function medidasEstados(estados) {
+    return new Map(estados.map((estado) => [estado.id, medirEstado(estado.eventos ?? [])]));
+}
+
+function markupEstado(cantidad) {
+    const markup = [
+        { tagName: 'rect', selector: 'body' },
+        { tagName: 'text', selector: 'estereotipo' },
+        { tagName: 'text', selector: 'nombre' },
+    ];
+
+    if (cantidad > 0) {
+        markup.push({ tagName: 'line', selector: 'separador' });
+
+        for (let indice = 0; indice < cantidad; indice += 1) {
+            markup.push({ tagName: 'text', selector: `evento-${indice}` });
+        }
+    }
+
+    markup.push({ tagName: 'title', selector: 'pista' });
+
+    return markup;
 }
 
 function acumular(medidas, hueco, inicio) {
@@ -138,12 +257,12 @@ function acumular(medidas, hueco, inicio) {
     return { inicios, total: posicion - hueco };
 }
 
-function calcularDisposicion(ids, orientacion) {
+function calcularDisposicion(ids, orientacion, medidas) {
     const o = ORIENTACIONES[orientacion];
     const ejes = (medida) => (o.principal === 'x' ? [medida.width, medida.height] : [medida.height, medida.width]);
     const nodos = ids.map((id, indice) => {
         const [principal, cruzado] = UBICACION[id] ?? [indice, 2];
-        const [largo, ancho] = ejes(tamano(id));
+        const [largo, ancho] = ejes(tamano(id, medidas));
 
         return { id, principal, cruzado, largo, ancho };
     });
@@ -233,7 +352,7 @@ function geometria(transicion, { o, ubicaciones }) {
     };
 }
 
-function crearNodo(id, estado, posicion, alcanzado, colores) {
+function crearNodo(id, estado, posicion, alcanzado, colores, medida) {
     if (id === INICIO) {
         return new Inicial({
             position: posicion,
@@ -258,25 +377,48 @@ function crearNodo(id, estado, posicion, alcanzado, colores) {
     }
 
     const pista = estado.actual ? 'estado actual' : estado.visitado ? 'visitado' : 'aún no visitado';
+    const bloques = medida?.bloques ?? [];
+    const detalle = bloques.map((bloque) => bloque.pista).join('\n');
+    const attrs = {
+        body: {
+            fill: estado.visitado || estado.actual ? estado.color : colores.fondo,
+            fillOpacity: estado.visitado || estado.actual ? 0.16 : 1,
+            stroke: estado.visitado || estado.actual ? estado.color : colores.borde,
+            strokeWidth: estado.actual ? 3 : 1.5,
+            strokeDasharray: estado.visitado || estado.actual ? 'none' : '4 3',
+        },
+        estereotipo: { text: estado.actual ? '«actual»' : '', fill: colores.texto },
+        nombre: {
+            text: estado.nombre,
+            y: bloques.length ? (estado.actual ? 26 : 20) : 'calc(h/2)',
+            fill: estado.visitado || estado.actual ? colores.texto : colores.muted,
+        },
+        pista: { text: detalle === '' ? `${estado.nombre} (${pista})` : `${estado.nombre} (${pista})\n${detalle}` },
+    };
+
+    if (bloques.length) {
+        attrs.separador = { stroke: colores.borde };
+
+        bloques.forEach((bloque, indice) => {
+            attrs[`evento-${indice}`] = {
+                x: 12,
+                y: bloque.y,
+                text: bloque.texto,
+                fill: bloque.rechazo ? colores.rechazo : colores.texto,
+                textAnchor: 'start',
+                textVerticalAnchor: 'top',
+                fontSize: 10,
+                lineHeight: `${ALTO_LINEA}px`,
+                fontFamily: FUENTE,
+            };
+        });
+    }
 
     return new Estado({
         position: posicion,
-        attrs: {
-            body: {
-                fill: estado.visitado || estado.actual ? estado.color : colores.fondo,
-                fillOpacity: estado.visitado || estado.actual ? 0.16 : 1,
-                stroke: estado.visitado || estado.actual ? estado.color : colores.borde,
-                strokeWidth: estado.actual ? 3 : 1.5,
-                strokeDasharray: estado.visitado || estado.actual ? 'none' : '4 3',
-            },
-            estereotipo: { text: estado.actual ? '«actual»' : '', fill: colores.texto },
-            nombre: {
-                text: estado.nombre,
-                y: estado.actual ? 36 : ESTADO.height / 2,
-                fill: estado.visitado || estado.actual ? colores.texto : colores.muted,
-            },
-            pista: { text: `${estado.nombre} (${pista})` },
-        },
+        size: { width: medida.width, height: medida.height },
+        markup: markupEstado(bloques.length),
+        attrs,
     });
 }
 
@@ -323,6 +465,7 @@ export function initDiagramaEstados(contenedor, datos) {
     }
 
     const estados = new Map(datos.estados.map((estado) => [estado.id, estado]));
+    const medidas = medidasEstados(datos.estados);
     const ids = [INICIO, ...estados.keys(), FIN];
     const finalAlcanzado = datos.transiciones.some((t) => t.destino === FIN && estados.get(t.origen)?.actual);
     let papel = null;
@@ -337,11 +480,12 @@ export function initDiagramaEstados(contenedor, datos) {
 
         papel?.remove();
 
-        const horizontal = calcularDisposicion(ids, 'horizontal');
+        const horizontal = calcularDisposicion(ids, 'horizontal', medidas);
         const disposicion = disponible >= horizontal.ancho * ESCALA_MINIMA_HORIZONTAL
             ? horizontal
-            : calcularDisposicion(ids, 'vertical');
-        const escala = Math.min(1, disponible / disposicion.ancho);
+            : calcularDisposicion(ids, 'vertical', medidas);
+        const proporcion = disponible / disposicion.ancho;
+        const escala = proporcion >= 0.8 ? Math.min(1, proporcion) : 1;
         const colores = coloresTema();
         const grafico = new dia.Graph({}, { cellNamespace: namespace });
         const nodos = new Map();
@@ -349,7 +493,7 @@ export function initDiagramaEstados(contenedor, datos) {
         ids.forEach((id) => {
             const { p, c } = disposicion.ubicaciones.get(id);
             const alcanzado = id === INICIO ? datos.pasos?.length > 0 : finalAlcanzado;
-            const nodo = crearNodo(id, estados.get(id), vector(disposicion.o, p, c), alcanzado, colores);
+            const nodo = crearNodo(id, estados.get(id), vector(disposicion.o, p, c), alcanzado, colores, medidas.get(id));
 
             nodo.addTo(grafico);
             nodos.set(id, nodo);

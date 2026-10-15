@@ -28,6 +28,22 @@ class RequerimientoDiagramaService
     {
         $pasos = $this->pasos($requerimiento);
         $visitados = array_filter(array_column($pasos, 'destino'));
+        $eventosPorEstado = [];
+
+        foreach ($pasos as $paso) {
+            if ($paso['destino'] === null) {
+                continue;
+            }
+
+            $eventosPorEstado[$paso['destino']][] = [
+                'numero' => $paso['numero'],
+                'accion' => $paso['accion'],
+                'actor' => $paso['actor'],
+                'fecha' => $paso['fecha'],
+                'observaciones' => $paso['observaciones'],
+                'rechazo' => $paso['rechazo'],
+            ];
+        }
 
         $estados = array_map(fn (EstadoRequerimiento $estado) => [
             'id' => $estado->value,
@@ -35,6 +51,7 @@ class RequerimientoDiagramaService
             'color' => $estado->hex(),
             'visitado' => in_array($estado->value, $visitados, true),
             'actual' => $estado === $requerimiento->estado,
+            'eventos' => $eventosPorEstado[$estado->value] ?? [],
         ], EstadoRequerimiento::cases());
 
         $transiciones = [];
