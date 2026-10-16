@@ -319,11 +319,11 @@
                             @else
                                 <span class="small text-body-secondary">Historial completo en esta vista.</span>
                             @endif
-                            @canany(['requerimientos.ver', 'requerimientos.revisar'])
+                            @if (auth()->user()->hasAnyPermission(['requerimientos.ver', 'requerimientos.revisar']))
                                 <a href="{{ route('requerimientos.index') }}" class="btn btn-sm btn-outline-primary">
                                     Ver listado de requerimientos
                                 </a>
-                            @endcanany
+                            @endif
                         </div>
                     @endif
                 </div>
